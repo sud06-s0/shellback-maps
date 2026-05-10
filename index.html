@@ -59,19 +59,36 @@
     ::-webkit-scrollbar-thumb { background: #c8922a; border-radius: 3px; }
 
     /* ── Hero ── */
-    .hero-desktop {
-      background-image:
-        linear-gradient(to bottom, rgba(2,11,24,0.35) 0%, rgba(2,11,24,0.6) 60%, rgba(2,11,24,1) 100%),
-        url('https://images.unsplash.com/photo-1614957004131-9e8f9b6e1d4d?w=1800&q=80');
-      background-size: cover;
-      background-position: center top;
+    .hero-desktop { background: #020b18; }
+    .hero-mobile  { background: #020b18; }
+
+    /* Video hero */
+    .hero-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      z-index: 0;
     }
-    .hero-mobile {
-      background-image:
-        linear-gradient(to bottom, rgba(2,11,24,0.4) 0%, rgba(2,11,24,0.65) 55%, rgba(2,11,24,1) 100%),
-        url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80');
-      background-size: cover;
-      background-position: center center;
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(2,11,24,0.35) 0%, rgba(2,11,24,0.82) 60%, rgba(2,11,24,1) 100%);
+      z-index: 1;
+    }
+    .hero-overlay-mobile {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(2,11,24,0.4) 0%, rgba(2,11,24,0.68) 55%, rgba(2,11,24,1) 100%);
+      z-index: 1;
+    }
+    /* Ensure hero content sits above video */
+    .hero-desktop > *:not(.hero-video):not(.hero-overlay),
+    .hero-mobile  > *:not(.hero-video):not(.hero-overlay-mobile) {
+      position: relative;
+      z-index: 2;
     }
 
     /* ── Nautical map grid overlay ── */
@@ -253,6 +270,19 @@
      HERO — DESKTOP
 ════════════════════════════════════════════ -->
 <section class="relative min-h-screen hidden md:flex flex-col justify-center hero-desktop map-grid pt-20">
+  <!-- Desktop background video (replace src with your own video) -->
+  <video
+    class="hero-video"
+    autoplay
+    muted
+    loop
+    playsinline
+    poster="https://images.unsplash.com/photo-1614957004131-9e8f9b6e1d4d?w=1800&q=80"
+  >
+    <source src="./vid/hero.mp4" type="video/mp4" />
+    <!-- Fallback: replace the src above with your own desktop-hero-video.mp4 -->
+  </video>
+  <div class="hero-overlay"></div>
   <!-- Compass Rose Decoration -->
   <div class="absolute top-10 right-10 opacity-10 compass-spin" aria-hidden="true">
     <i class="fa-solid fa-compass text-gold-400 text-8xl lg:text-9xl"></i>
@@ -310,6 +340,19 @@
      HERO — MOBILE
 ════════════════════════════════════════════ -->
 <section class="relative min-h-screen flex flex-col justify-center md:hidden hero-mobile map-grid pt-20 pb-16">
+  <!-- Mobile background video (replace src with your own video) -->
+  <video
+    class="hero-video"
+    autoplay
+    muted
+    loop
+    playsinline
+    poster="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80"
+  >
+    <source src="./vid/hero-mob.mp4" type="video/mp4" />
+    <!-- Fallback: replace the src above with your own mobile-hero-video.mp4 -->
+  </video>
+  <div class="hero-overlay-mobile"></div>
   <div class="absolute top-6 right-4 opacity-10 compass-spin" aria-hidden="true">
     <i class="fa-solid fa-compass text-gold-400 text-6xl"></i>
   </div>
@@ -894,7 +937,7 @@
       <!-- Brand -->
       <div class="lg:col-span-1">
         <div class="flex items-center gap-3 mb-5">
-          <img src="./img/logo.png" alt="Shellback Marines Logo" class="w-10 h-10 rounded-full object-contain border-2 border-gold-500 bg-navy-800" />
+          <img src="logo.png" alt="Shellback Marines Logo" class="w-10 h-10 rounded-full object-contain border-2 border-gold-500 bg-navy-800" />
           <div>
             <div class="font-display font-bold text-white text-base">Shellback Marines</div>
             <div class="coord-text">SINCE 2023</div>
