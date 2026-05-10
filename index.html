@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shellback Marines – Premier Source for Hydrographic Products & Nautical Charts</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: {
+              950: '#020b18',
+              900: '#041424',
+              800: '#072238',
+              700: '#0c3454',
+              600: '#114a76',
+              500: '#155f98',
+            },
+            ocean: {
+              500: '#0e7490',
+              400: '#0891b2',
+              300: '#22d3ee',
+              200: '#a5f3fc',
+            },
+            gold: {
+              500: '#c8922a',
+              400: '#d4a843',
+              300: '#e8c76a',
+              200: '#fde68a',
+            },
+            sand: '#f5f0e8',
+            'chart-line': '#c8922a',
+          },
+          fontFamily: {
+            display: ['Playfair Display', 'serif'],
+            body: ['Barlow', 'sans-serif'],
+            condensed: ['Barlow Condensed', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* ── Base ── */
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Barlow', sans-serif; background: #020b18; color: #e2e8f0; overflow-x: hidden; }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #041424; }
+    ::-webkit-scrollbar-thumb { background: #c8922a; border-radius: 3px; }
+
+    /* ── Hero ── */
+    .hero-desktop {
+      background-image:
+        linear-gradient(to bottom, rgba(2,11,24,0.35) 0%, rgba(2,11,24,0.6) 60%, rgba(2,11,24,1) 100%),
+        url('https://images.unsplash.com/photo-1614957004131-9e8f9b6e1d4d?w=1800&q=80');
+      background-size: cover;
+      background-position: center top;
+    }
+    .hero-mobile {
+      background-image:
+        linear-gradient(to bottom, rgba(2,11,24,0.4) 0%, rgba(2,11,24,0.65) 55%, rgba(2,11,24,1) 100%),
+        url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80');
+      background-size: cover;
+      background-position: center center;
+    }
+
+    /* ── Nautical map grid overlay ── */
+    .map-grid {
+      background-image:
+        linear-gradient(rgba(200,146,42,0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(200,146,42,0.07) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    .map-grid-dense {
+      background-image:
+        linear-gradient(rgba(200,146,42,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(200,146,42,0.04) 1px, transparent 1px);
+      background-size: 30px 30px;
+    }
+
+    /* ── Compass rose spinner ── */
+    @keyframes spin-slow { to { transform: rotate(360deg); } }
+    .compass-spin { animation: spin-slow 30s linear infinite; }
+
+    /* ── Reveal animations ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(32px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    .fade-up  { animation: fadeUp  0.9s ease both; }
+    .fade-in  { animation: fadeIn  1.2s ease both; }
+    .delay-1  { animation-delay: 0.15s; }
+    .delay-2  { animation-delay: 0.35s; }
+    .delay-3  { animation-delay: 0.55s; }
+    .delay-4  { animation-delay: 0.75s; }
+
+    /* ── Navbar blur glass ── */
+    .glass-nav {
+      backdrop-filter: blur(16px) saturate(160%);
+      -webkit-backdrop-filter: blur(16px) saturate(160%);
+      background: rgba(2,11,24,0.78);
+      border-bottom: 1px solid rgba(200,146,42,0.18);
+    }
+
+    /* ── Gold divider ── */
+    .gold-divider {
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #c8922a, transparent);
+    }
+
+    /* ── Card hover lift ── */
+    .card-lift {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card-lift:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(200,146,42,0.25);
+    }
+
+    /* ── Product card image zoom ── */
+    .img-zoom { overflow: hidden; }
+    .img-zoom img { transition: transform 0.5s ease; }
+    .img-zoom:hover img { transform: scale(1.06); }
+
+    /* ── Testimonial quote mark ── */
+    .quote-mark::before {
+      content: '\201C';
+      font-family: 'Playfair Display', serif;
+      font-size: 5rem;
+      color: #c8922a;
+      line-height: 0;
+      position: absolute;
+      top: 1.5rem;
+      left: 1rem;
+      opacity: 0.4;
+    }
+
+    /* ── Stats counter shimmer ── */
+    .stat-shimmer {
+      background: linear-gradient(135deg, rgba(7,34,56,0.9), rgba(12,52,84,0.9));
+      border: 1px solid rgba(200,146,42,0.2);
+    }
+
+    /* ── Mobile menu ── */
+    #mobile-menu { transition: max-height 0.4s ease, opacity 0.4s ease; max-height: 0; opacity: 0; overflow: hidden; }
+    #mobile-menu.open { max-height: 500px; opacity: 1; }
+
+    /* ── Scroll-reveal via IntersectionObserver ── */
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-left { opacity: 0; transform: translateX(-30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal-left.visible { opacity: 1; transform: translateX(0); }
+    .reveal-right { opacity: 0; transform: translateX(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal-right.visible { opacity: 1; transform: translateX(0); }
+
+    /* ── Active nav underline ── */
+    .nav-link { position: relative; }
+    .nav-link::after {
+      content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 1px;
+      background: #c8922a; transition: width 0.3s ease;
+    }
+    .nav-link:hover::after { width: 100%; }
+
+    /* ── Category pill ── */
+    .category-pill {
+      background: linear-gradient(135deg, rgba(12,52,84,0.8), rgba(7,34,56,0.9));
+      border: 1px solid rgba(200,146,42,0.3);
+      transition: all 0.3s ease;
+    }
+    .category-pill:hover {
+      background: linear-gradient(135deg, #c8922a, #d4a843);
+      border-color: transparent;
+      color: #020b18;
+    }
+
+    /* ── Anchor/coordinate decorations ── */
+    .coord-text {
+      font-family: 'Barlow Condensed', sans-serif;
+      letter-spacing: 0.15em;
+      color: rgba(200,146,42,0.5);
+      font-size: 0.65rem;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════
+     NAVBAR
+════════════════════════════════════════════ -->
+<header id="navbar" class="fixed top-0 left-0 right-0 z-50 glass-nav transition-all duration-300">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16 lg:h-20">
+
+      <!-- Logo -->
+      <a href="index.html" class="flex items-center gap-3 group">
+        <!-- Replace src with your actual logo -->
+        <div class="w-10 h-10 lg:w-12 lg:h-12 rounded-full border-2 border-gold-500 flex items-center justify-center bg-navy-800 group-hover:border-gold-300 transition-colors">
+          <i class="fa-solid fa-anchor text-gold-500 text-lg lg:text-xl group-hover:text-gold-300 transition-colors"></i>
+        </div>
+        <div>
+          <div class="font-display font-bold text-white text-base lg:text-lg leading-tight">Shellback Marines</div>
+          <div class="coord-text hidden sm:block">HYDROGRAPHIC PRODUCTS & NAUTICAL CHARTS</div>
+        </div>
+      </a>
+
+      <!-- Desktop Nav -->
+      <nav class="hidden lg:flex items-center gap-8">
+        <a href="index.html" class="nav-link active-page text-gold-300 font-body text-sm font-medium transition-colors">Home</a>
+        <a href="about.html" class="nav-link text-slate-300 hover:text-gold-300 font-body text-sm font-medium transition-colors">About Us</a>
+        <a href="products.html" class="nav-link text-slate-300 hover:text-gold-300 font-body text-sm font-medium transition-colors">Products</a>
+        <a href="index.html#why-us" class="nav-link text-slate-300 hover:text-gold-300 font-body text-sm font-medium transition-colors">Why Us</a>
+        <a href="contact.html" class="nav-link text-slate-300 hover:text-gold-300 font-body text-sm font-medium transition-colors">Contact</a>
+        <a href="shop.html" class="bg-gold-500 hover:bg-gold-400 text-navy-950 font-condensed font-bold text-sm px-5 py-2.5 uppercase tracking-wider transition-colors rounded-sm">
+          <i class="fa-solid fa-store mr-1.5"></i>Shop Now
+        </a>
+      </nav>
+
+      <!-- Mobile Toggle -->
+      <button id="menu-btn" class="lg:hidden text-gold-400 text-2xl p-2" aria-label="Toggle menu">
+        <i id="menu-icon" class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="lg:hidden bg-navy-900 border-t border-gold-500/20">
+    <div class="px-4 py-4 flex flex-col gap-1">
+      <a href="index.html" class="text-gold-300 py-2.5 border-b border-white/5 font-body">Home</a>
+      <a href="about.html" class="text-slate-300 hover:text-gold-300 py-2.5 border-b border-white/5 font-body">About Us</a>
+      <a href="products.html" class="text-slate-300 hover:text-gold-300 py-2.5 border-b border-white/5 font-body">Products</a>
+      <a href="index.html#why-us" class="text-slate-300 hover:text-gold-300 py-2.5 border-b border-white/5 font-body">Why Us</a>
+      <a href="contact.html" class="text-slate-300 hover:text-gold-300 py-2.5 border-b border-white/5 font-body">Contact</a>
+      <a href="shop.html" class="mt-3 bg-gold-500 text-navy-950 font-condensed font-bold text-sm px-5 py-3 uppercase tracking-wider text-center rounded-sm">
+        <i class="fa-solid fa-store mr-1.5"></i>Shop Now
+      </a>
+    </div>
+  </div>
+</header>
+
+
+<!-- ════════════════════════════════════════════
+     HERO — DESKTOP
+════════════════════════════════════════════ -->
+<section class="relative min-h-screen hidden md:flex flex-col justify-center hero-desktop map-grid pt-20">
+  <!-- Compass Rose Decoration -->
+  <div class="absolute top-10 right-10 opacity-10 compass-spin" aria-hidden="true">
+    <i class="fa-solid fa-compass text-gold-400 text-8xl lg:text-9xl"></i>
+  </div>
+  <!-- Coordinate Labels -->
+  <div class="absolute top-24 left-6 coord-text">N 22°34.8′ / E 88°21.6′</div>
+  <div class="absolute bottom-32 right-8 coord-text">CHART REF: IND-001</div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+    <div class="max-w-3xl">
+      <div class="flex items-center gap-3 mb-6 fade-in">
+        <div class="h-px w-10 bg-gold-500"></div>
+        <span class="coord-text text-gold-400 tracking-widest text-xs uppercase font-condensed">Premier Hydrographic Products</span>
+      </div>
+      <h1 class="font-display font-black text-white text-5xl lg:text-6xl xl:text-7xl leading-tight mb-6 fade-up delay-1">
+        Navigational<br/>
+        <span class="text-gold-400">Excellence</span><br/>
+        Through Precise Charts
+      </h1>
+      <p class="font-body text-slate-300 text-lg lg:text-xl leading-relaxed mb-10 max-w-xl fade-up delay-2">
+        India's trusted source for hydrographic products and nautical charts — crafted for maritime professionals, naval forces, and seafarers who demand accuracy at sea.
+      </p>
+      <div class="flex flex-wrap gap-4 fade-up delay-3">
+        <a href="products.html" class="bg-gold-500 hover:bg-gold-400 text-navy-950 font-condensed font-bold uppercase tracking-wider px-8 py-4 transition-all hover:scale-105 rounded-sm text-sm">
+          <i class="fa-solid fa-map mr-2"></i>Explore Charts
+        </a>
+        <a href="about.html" class="border border-gold-500/50 hover:border-gold-400 text-gold-300 hover:text-gold-200 font-condensed font-bold uppercase tracking-wider px-8 py-4 transition-all rounded-sm text-sm">
+          <i class="fa-solid fa-circle-info mr-2"></i>Know More
+        </a>
+      </div>
+      <!-- Trust Badges -->
+      <div class="flex flex-wrap gap-6 mt-12 fade-up delay-4">
+        <div class="flex items-center gap-2 text-slate-400 text-sm">
+          <i class="fa-solid fa-shield-halved text-gold-400"></i>
+          <span>Regulatory Compliant</span>
+        </div>
+        <div class="flex items-center gap-2 text-slate-400 text-sm">
+          <i class="fa-solid fa-certificate text-gold-400"></i>
+          <span>IHO Standards</span>
+        </div>
+        <div class="flex items-center gap-2 text-slate-400 text-sm">
+          <i class="fa-solid fa-flag text-gold-400"></i>
+          <span>Proudly Indian</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Wave Fade Bottom -->
+  <div class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-navy-950 to-transparent pointer-events-none"></div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     HERO — MOBILE
+════════════════════════════════════════════ -->
+<section class="relative min-h-screen flex flex-col justify-center md:hidden hero-mobile map-grid pt-20 pb-16">
+  <div class="absolute top-6 right-4 opacity-10 compass-spin" aria-hidden="true">
+    <i class="fa-solid fa-compass text-gold-400 text-6xl"></i>
+  </div>
+
+  <div class="px-5 w-full">
+    <div class="flex items-center gap-2 mb-5 fade-in">
+      <div class="h-px w-8 bg-gold-500"></div>
+      <span class="text-gold-400 tracking-widest text-xs uppercase font-condensed">Premier Hydrographic Products</span>
+    </div>
+    <h1 class="font-display font-black text-white text-4xl leading-tight mb-5 fade-up delay-1">
+      Navigational<br/><span class="text-gold-400">Excellence</span><br/>Through Charts
+    </h1>
+    <p class="font-body text-slate-300 text-base leading-relaxed mb-8 fade-up delay-2">
+      India's trusted source for nautical charts and hydrographic products — precision you can navigate by.
+    </p>
+    <div class="flex flex-col gap-3 fade-up delay-3">
+      <a href="products.html" class="bg-gold-500 text-navy-950 font-condensed font-bold uppercase tracking-wider px-6 py-3.5 text-center rounded-sm text-sm">
+        <i class="fa-solid fa-map mr-2"></i>Explore Charts
+      </a>
+      <a href="about.html" class="border border-gold-500/50 text-gold-300 font-condensed font-bold uppercase tracking-wider px-6 py-3.5 text-center rounded-sm text-sm">
+        <i class="fa-solid fa-circle-info mr-2"></i>Know More
+      </a>
+    </div>
+  </div>
+  <div class="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-navy-950 to-transparent pointer-events-none"></div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     STATS STRIP
+════════════════════════════════════════════ -->
+<section class="bg-navy-950 map-grid-dense py-12 border-y border-gold-500/10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="stat-shimmer rounded p-6 text-center reveal">
+        <div class="font-display font-bold text-gold-400 text-4xl mb-1">500+</div>
+        <div class="text-slate-400 text-sm font-condensed uppercase tracking-wider">Nautical Charts</div>
+      </div>
+      <div class="stat-shimmer rounded p-6 text-center reveal" style="transition-delay:0.1s">
+        <div class="font-display font-bold text-gold-400 text-4xl mb-1">15+</div>
+        <div class="text-slate-400 text-sm font-condensed uppercase tracking-wider">Years Experience</div>
+      </div>
+      <div class="stat-shimmer rounded p-6 text-center reveal" style="transition-delay:0.2s">
+        <div class="font-display font-bold text-gold-400 text-4xl mb-1">1000+</div>
+        <div class="text-slate-400 text-sm font-condensed uppercase tracking-wider">Mariners Served</div>
+      </div>
+      <div class="stat-shimmer rounded p-6 text-center reveal" style="transition-delay:0.3s">
+        <div class="font-display font-bold text-gold-400 text-4xl mb-1">100%</div>
+        <div class="text-slate-400 text-sm font-condensed uppercase tracking-wider">Regulatory Compliant</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     WHY NAUTICAL CHARTS MATTER
+════════════════════════════════════════════ -->
+<section id="why-us" class="bg-navy-950 py-20 lg:py-28">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="text-center mb-16 reveal">
+      <span class="font-condensed text-gold-400 uppercase tracking-widest text-sm">Why It Matters</span>
+      <h2 class="font-display font-bold text-white text-3xl lg:text-5xl mt-3 mb-5">
+        Precision That Keeps You <span class="text-gold-400">Safe at Sea</span>
+      </h2>
+      <div class="gold-divider w-24 mx-auto"></div>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+      <!-- Card 1 -->
+      <div class="bg-navy-800 border border-gold-500/10 rounded p-7 card-lift reveal">
+        <div class="w-14 h-14 bg-navy-700 rounded flex items-center justify-center mb-5 border border-gold-500/20">
+          <i class="fa-solid fa-life-ring text-gold-400 text-2xl"></i>
+        </div>
+        <h3 class="font-display font-semibold text-white text-lg mb-3">Safety at Sea</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">
+          Accurate and up-to-date nautical charts provide essential information for safe navigation, helping mariners avoid hazards, shoals, and dangerous shallow waters in unfamiliar passages.
+        </p>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="bg-navy-800 border border-gold-500/10 rounded p-7 card-lift reveal" style="transition-delay:0.1s">
+        <div class="w-14 h-14 bg-navy-700 rounded flex items-center justify-center mb-5 border border-gold-500/20">
+          <i class="fa-solid fa-route text-gold-400 text-2xl"></i>
+        </div>
+        <h3 class="font-display font-semibold text-white text-lg mb-3">Efficient Route Planning</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">
+          Hydrographic surveys offer detailed underwater topography, enabling precise route planning — reducing fuel consumption, cutting travel time, and lowering operational costs.
+        </p>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="bg-navy-800 border border-gold-500/10 rounded p-7 card-lift reveal" style="transition-delay:0.2s">
+        <div class="w-14 h-14 bg-navy-700 rounded flex items-center justify-center mb-5 border border-gold-500/20">
+          <i class="fa-solid fa-industry text-gold-400 text-2xl"></i>
+        </div>
+        <h3 class="font-display font-semibold text-white text-lg mb-3">Resource Optimization</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">
+          For shipping, fisheries, and offshore energy industries, precise hydrographic data ensures optimal placement of resources, boosting productivity and minimizing environmental impact.
+        </p>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="bg-navy-800 border border-gold-500/10 rounded p-7 card-lift reveal" style="transition-delay:0.3s">
+        <div class="w-14 h-14 bg-navy-700 rounded flex items-center justify-center mb-5 border border-gold-500/20">
+          <i class="fa-solid fa-file-contract text-gold-400 text-2xl"></i>
+        </div>
+        <h3 class="font-display font-semibold text-white text-lg mb-3">Regulatory Compliance</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">
+          Many maritime authorities mandate accurate and updated charts onboard. Our products ensure full compliance with national and international maritime regulations.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     ABOUT US
+════════════════════════════════════════════ -->
+<section id="about" class="bg-navy-900 py-20 lg:py-28 border-y border-gold-500/10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid lg:grid-cols-2 gap-14 items-center">
+
+      <!-- Image Side -->
+      <div class="relative reveal-left">
+        <!-- Main image -->
+        <div class="img-zoom rounded overflow-hidden shadow-2xl">
+          <img
+            src="https://images.unsplash.com/photo-1569336415962-a4bd9f69c37a?w=800&q=80"
+            alt="Nautical chart being studied by a maritime professional"
+            class="w-full h-80 lg:h-[520px] object-cover"
+          />
+        </div>
+        <!-- Floating accent image -->
+        <div class="absolute -bottom-6 -right-6 w-48 h-36 lg:w-64 lg:h-48 rounded overflow-hidden border-4 border-navy-900 shadow-2xl img-zoom hidden sm:block">
+          <img
+            src="https://images.unsplash.com/photo-1502637098811-fa9526d2b659?w=400&q=80"
+            alt="Ship navigation instruments"
+            class="w-full h-full object-cover"
+          />
+        </div>
+        <!-- Gold corner accent -->
+        <div class="absolute -top-4 -left-4 w-16 h-16 border-t-2 border-l-2 border-gold-500 opacity-60 hidden sm:block"></div>
+        <div class="absolute -bottom-10 -right-2 coord-text hidden lg:block">22°N — BAY OF BENGAL</div>
+      </div>
+
+      <!-- Text Side -->
+      <div class="reveal-right lg:pl-6">
+        <span class="font-condensed text-gold-400 uppercase tracking-widest text-sm">About Us</span>
+        <h2 class="font-display font-bold text-white text-3xl lg:text-4xl mt-3 mb-6 leading-tight">
+          How Shellback Marines <span class="text-gold-400">Benefits You</span>
+        </h2>
+        <div class="gold-divider w-16 mb-7"></div>
+        <p class="text-slate-300 leading-relaxed mb-5">
+          Shellback Marines is a distinguished eCommerce platform specializing in hydrographic products and nautical charting solutions. Renowned for our commitment to navigational excellence, we offer a comprehensive range of products tailored to meet the precise needs of maritime professionals and enthusiasts alike.
+        </p>
+        <p class="text-slate-400 leading-relaxed mb-8">
+          With a steadfast dedication to safety and efficiency at sea, we ensure mariners have access to the most accurate, up-to-date charts available. Our hydrographic surveys provide detailed insights into underwater terrain, empowering users to navigate with confidence and precision — while promoting responsible environmental stewardship.
+        </p>
+
+        <!-- USPs -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
+          <div class="flex items-start gap-3">
+            <i class="fa-solid fa-check-circle text-gold-400 mt-0.5 flex-shrink-0"></i>
+            <span class="text-slate-300 text-sm">Up-to-date nautical charts</span>
+          </div>
+          <div class="flex items-start gap-3">
+            <i class="fa-solid fa-check-circle text-gold-400 mt-0.5 flex-shrink-0"></i>
+            <span class="text-slate-300 text-sm">IHO-compliant hydrographic data</span>
+          </div>
+          <div class="flex items-start gap-3">
+            <i class="fa-solid fa-check-circle text-gold-400 mt-0.5 flex-shrink-0"></i>
+            <span class="text-slate-300 text-sm">Expert maritime consultation</span>
+          </div>
+          <div class="flex items-start gap-3">
+            <i class="fa-solid fa-check-circle text-gold-400 mt-0.5 flex-shrink-0"></i>
+            <span class="text-slate-300 text-sm">Fast & secure delivery across India</span>
+          </div>
+          <div class="flex items-start gap-3">
+            <i class="fa-solid fa-check-circle text-gold-400 mt-0.5 flex-shrink-0"></i>
+            <span class="text-slate-300 text-sm">Paper & digital chart formats</span>
+          </div>
+          <div class="flex items-start gap-3">
+            <i class="fa-solid fa-check-circle text-gold-400 mt-0.5 flex-shrink-0"></i>
+            <span class="text-slate-300 text-sm">Proudly serving Indian Navy & Coast Guard</span>
+          </div>
+        </div>
+
+        <a href="shop.html" class="inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-400 text-navy-950 font-condensed font-bold uppercase tracking-wider px-8 py-4 transition-all hover:scale-105 rounded-sm text-sm">
+          <i class="fa-solid fa-store"></i>Browse Our Shop
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     PRODUCT CATEGORIES
+════════════════════════════════════════════ -->
+<section id="products" class="bg-navy-950 map-grid py-20 lg:py-28">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="text-center mb-16 reveal">
+      <span class="font-condensed text-gold-400 uppercase tracking-widest text-sm">Our Catalogue</span>
+      <h2 class="font-display font-bold text-white text-3xl lg:text-5xl mt-3 mb-5">
+        Charts & <span class="text-gold-400">Hydrographic Products</span>
+      </h2>
+      <div class="gold-divider w-24 mx-auto mb-5"></div>
+      <p class="text-slate-400 max-w-xl mx-auto">
+        Precision-crafted navigational tools trusted by naval forces, merchant vessels, fisheries, and maritime enthusiasts across Indian waters.
+      </p>
+    </div>
+
+    <!-- Category Pills -->
+    <div class="flex flex-wrap gap-3 justify-center mb-12 reveal">
+      <button class="category-pill text-gold-300 font-condensed uppercase tracking-wider text-sm px-5 py-2.5 rounded-full active" onclick="filterCategory('all', this)">All Products</button>
+      <button class="category-pill text-gold-300 font-condensed uppercase tracking-wider text-sm px-5 py-2.5 rounded-full" onclick="filterCategory('paper-charts', this)">Paper Charts</button>
+      <button class="category-pill text-gold-300 font-condensed uppercase tracking-wider text-sm px-5 py-2.5 rounded-full" onclick="filterCategory('publications', this)">Nautical Publications</button>
+      <button class="category-pill text-gold-300 font-condensed uppercase tracking-wider text-sm px-5 py-2.5 rounded-full" onclick="filterCategory('instruments', this)">Instruments</button>
+    </div>
+
+    <!-- Product Grid -->
+    <div id="product-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-7">
+
+      <!-- Product 1 -->
+      <div class="product-card bg-navy-800 rounded overflow-hidden card-lift border border-gold-500/10 reveal" data-cat="paper-charts">
+        <div class="img-zoom h-52">
+          <img src="https://images.unsplash.com/photo-1526778548025-fa2f459cd5ce?w=600&q=80" alt="India Coastal Charts" class="w-full h-full object-cover" />
+        </div>
+        <div class="p-6">
+          <span class="text-gold-400 text-xs font-condensed uppercase tracking-wider">Paper Charts</span>
+          <h3 class="font-display font-semibold text-white text-lg mt-1 mb-2">India Coastal Navigation Charts</h3>
+          <p class="text-slate-400 text-sm leading-relaxed mb-4">Comprehensive coverage of India's entire coastline — Arabian Sea, Bay of Bengal, and Indian Ocean approaches with depth contours and hazard markings.</p>
+          <div class="flex items-center justify-between">
+            <a href="shop.html" class="text-gold-400 hover:text-gold-300 font-condensed text-sm uppercase tracking-wider transition-colors">
+              View Details <i class="fa-solid fa-arrow-right ml-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product 2 -->
+      <div class="product-card bg-navy-800 rounded overflow-hidden card-lift border border-gold-500/10 reveal" style="transition-delay:0.1s" data-cat="publications">
+        <div class="img-zoom h-52">
+          <img src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=600&q=80" alt="Nautical Publications" class="w-full h-full object-cover" />
+        </div>
+        <div class="p-6">
+          <span class="text-gold-400 text-xs font-condensed uppercase tracking-wider">Nautical Publications</span>
+          <h3 class="font-display font-semibold text-white text-lg mt-1 mb-2">Sailing Directions & Pilots</h3>
+          <p class="text-slate-400 text-sm leading-relaxed mb-4">Official sailing directions, light lists, tide tables, and navigational notices for Indian ports and surrounding oceanic regions.</p>
+          <div class="flex items-center justify-between">
+            <a href="shop.html" class="text-gold-400 hover:text-gold-300 font-condensed text-sm uppercase tracking-wider transition-colors">
+              View Details <i class="fa-solid fa-arrow-right ml-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product 3 -->
+      <div class="product-card bg-navy-800 rounded overflow-hidden card-lift border border-gold-500/10 reveal" style="transition-delay:0.2s" data-cat="paper-charts">
+        <div class="img-zoom h-52">
+          <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=600&q=80" alt="Port Approach Charts" class="w-full h-full object-cover" />
+        </div>
+        <div class="p-6">
+          <span class="text-gold-400 text-xs font-condensed uppercase tracking-wider">Paper Charts</span>
+          <h3 class="font-display font-semibold text-white text-lg mt-1 mb-2">Port Approach & Harbour Plans</h3>
+          <p class="text-slate-400 text-sm leading-relaxed mb-4">Large-scale harbour plans and port approach charts for major Indian ports — Mumbai, Kolkata, Chennai, Visakhapatnam, and more.</p>
+          <div class="flex items-center justify-between">
+            <a href="shop.html" class="text-gold-400 hover:text-gold-300 font-condensed text-sm uppercase tracking-wider transition-colors">
+              View Details <i class="fa-solid fa-arrow-right ml-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product 4 -->
+      <div class="product-card bg-navy-800 rounded overflow-hidden card-lift border border-gold-500/10 reveal" data-cat="instruments">
+        <div class="img-zoom h-52">
+          <img src="https://images.unsplash.com/photo-1565793298595-6a879b1d9492?w=600&q=80" alt="Navigation Instruments" class="w-full h-full object-cover" />
+        </div>
+        <div class="p-6">
+          <span class="text-gold-400 text-xs font-condensed uppercase tracking-wider">Instruments</span>
+          <h3 class="font-display font-semibold text-white text-lg mt-1 mb-2">Navigational Instruments & Tools</h3>
+          <p class="text-slate-400 text-sm leading-relaxed mb-4">Professional-grade chart plotters, dividers, parallel rules, and protractors trusted by naval officers and merchant marine navigators.</p>
+          <div class="flex items-center justify-between">
+            <a href="shop.html" class="text-gold-400 hover:text-gold-300 font-condensed text-sm uppercase tracking-wider transition-colors">
+              View Details <i class="fa-solid fa-arrow-right ml-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product 5 -->
+      <div class="product-card bg-navy-800 rounded overflow-hidden card-lift border border-gold-500/10 reveal" style="transition-delay:0.1s" data-cat="publications">
+        <div class="img-zoom h-52">
+          <img src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&q=80" alt="Hydrographic Survey" class="w-full h-full object-cover" />
+        </div>
+        <div class="p-6">
+          <span class="text-gold-400 text-xs font-condensed uppercase tracking-wider">Nautical Publications</span>
+          <h3 class="font-display font-semibold text-white text-lg mt-1 mb-2">Hydrographic Survey Reports</h3>
+          <p class="text-slate-400 text-sm leading-relaxed mb-4">Detailed bathymetric and hydrographic survey reports providing underwater terrain analysis for safe maritime operations and offshore projects.</p>
+          <div class="flex items-center justify-between">
+            <a href="shop.html" class="text-gold-400 hover:text-gold-300 font-condensed text-sm uppercase tracking-wider transition-colors">
+              View Details <i class="fa-solid fa-arrow-right ml-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product 6 -->
+      <div class="product-card bg-navy-800 rounded overflow-hidden card-lift border border-gold-500/10 reveal" style="transition-delay:0.2s" data-cat="paper-charts">
+        <div class="img-zoom h-52">
+          <img src="https://images.unsplash.com/photo-1614851099511-773084f6b54f?w=600&q=80" alt="Ocean Charts" class="w-full h-full object-cover" />
+        </div>
+        <div class="p-6">
+          <span class="text-gold-400 text-xs font-condensed uppercase tracking-wider">Paper Charts</span>
+          <h3 class="font-display font-semibold text-white text-lg mt-1 mb-2">Indian Ocean Routing Charts</h3>
+          <p class="text-slate-400 text-sm leading-relaxed mb-4">Monthly routing charts covering the full Indian Ocean region with seasonal weather patterns, current data, and recommended shipping lanes.</p>
+          <div class="flex items-center justify-between">
+            <a href="shop.html" class="text-gold-400 hover:text-gold-300 font-condensed text-sm uppercase tracking-wider transition-colors">
+              View Details <i class="fa-solid fa-arrow-right ml-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="text-center mt-12 reveal">
+      <a id="shop" href="contact.html" class="inline-flex items-center gap-2 border border-gold-500/50 hover:border-gold-400 text-gold-300 font-condensed font-bold uppercase tracking-wider px-10 py-4 transition-all hover:bg-gold-500/10 rounded-sm">
+        <i class="fa-solid fa-store"></i>View Full Catalogue
+      </a>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     MAP FEATURE HIGHLIGHT (Full Width Banner)
+════════════════════════════════════════════ -->
+<section class="relative py-20 lg:py-28 overflow-hidden">
+  <div class="absolute inset-0">
+    <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=1800&q=80" alt="Nautical map background" class="w-full h-full object-cover opacity-20" />
+    <div class="absolute inset-0 bg-gradient-to-r from-navy-950 via-navy-900/90 to-navy-950"></div>
+  </div>
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid lg:grid-cols-2 gap-12 items-center">
+      <div class="reveal-left">
+        <span class="font-condensed text-gold-400 uppercase tracking-widest text-sm">Chart Intelligence</span>
+        <h2 class="font-display font-bold text-white text-3xl lg:text-4xl mt-3 mb-6 leading-tight">
+          Every Detail Matters<br/><span class="text-gold-400">When Lives Are at Stake</span>
+        </h2>
+        <div class="gold-divider w-16 mb-7"></div>
+        <p class="text-slate-300 leading-relaxed mb-6">
+          Nautical charts are not merely maps — they are living documents constantly updated with Notice to Mariners, corrected for shifting sand bars, newly discovered wrecks, changed buoy positions, and updated depth soundings. At Shellback Marines, we stock only the latest corrected editions.
+        </p>
+        <p class="text-slate-400 leading-relaxed">
+          Whether you are navigating the shallow backwaters of Kerala, the busy shipping lanes of the Bay of Bengal, or the open waters of the Arabian Sea, our charts provide the granular detail that professional navigators rely on.
+        </p>
+      </div>
+      <div class="grid grid-cols-2 gap-4 reveal-right">
+        <div class="bg-navy-800/80 border border-gold-500/15 rounded p-5 card-lift">
+          <i class="fa-solid fa-water text-ocean-400 text-2xl mb-3"></i>
+          <h4 class="font-display font-semibold text-white mb-2">Depth Contours</h4>
+          <p class="text-slate-400 text-sm">Precise bathymetric soundings for safe passage through shallow and congested waterways.</p>
+        </div>
+        <div class="bg-navy-800/80 border border-gold-500/15 rounded p-5 card-lift">
+          <i class="fa-solid fa-lightbulb text-ocean-400 text-2xl mb-3"></i>
+          <h4 class="font-display font-semibold text-white mb-2">Lights & Buoys</h4>
+          <p class="text-slate-400 text-sm">Complete light characteristics, buoy positions, and aid-to-navigation data for night sailing.</p>
+        </div>
+        <div class="bg-navy-800/80 border border-gold-500/15 rounded p-5 card-lift">
+          <i class="fa-solid fa-wind text-ocean-400 text-2xl mb-3"></i>
+          <h4 class="font-display font-semibold text-white mb-2">Current & Tides</h4>
+          <p class="text-slate-400 text-sm">Tidal stream data, current patterns, and seasonal monsoon routing information.</p>
+        </div>
+        <div class="bg-navy-800/80 border border-gold-500/15 rounded p-5 card-lift">
+          <i class="fa-solid fa-triangle-exclamation text-ocean-400 text-2xl mb-3"></i>
+          <h4 class="font-display font-semibold text-white mb-2">Hazard Marking</h4>
+          <p class="text-slate-400 text-sm">Wrecks, rocks, restricted areas, and maritime traffic separation schemes clearly marked.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     TESTIMONIALS
+════════════════════════════════════════════ -->
+<section class="bg-navy-900 py-20 lg:py-28 border-y border-gold-500/10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="text-center mb-14 reveal">
+      <span class="font-condensed text-gold-400 uppercase tracking-widest text-sm">From Our Mariners</span>
+      <h2 class="font-display font-bold text-white text-3xl lg:text-4xl mt-3 mb-4">
+        Trusted by <span class="text-gold-400">Seafarers Across India</span>
+      </h2>
+      <div class="gold-divider w-24 mx-auto"></div>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-7">
+
+      <div class="relative bg-navy-800 border border-gold-500/10 rounded p-8 quote-mark card-lift reveal">
+        <div class="pt-4">
+          <p class="text-slate-300 italic leading-relaxed mb-6">The charts I ordered for our patrol vessel were accurate, well-corrected, and arrived promptly. Shellback Marines understands what mariners actually need.</p>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-navy-700 rounded-full flex items-center justify-center border border-gold-500/20">
+              <i class="fa-solid fa-user text-gold-400 text-sm"></i>
+            </div>
+            <div>
+              <div class="text-white font-semibold text-sm">Cdr. Ramesh V.</div>
+              <div class="text-gold-400 text-xs font-condensed uppercase tracking-wider">Indian Navy</div>
+            </div>
+          </div>
+          <div class="flex gap-1 mt-3">
+            <i class="fa-solid fa-star text-gold-400 text-xs"></i>
+            <i class="fa-solid fa-star text-gold-400 text-xs"></i>
+            <i class="fa-solid fa-star text-gold-400 text-xs"></i>
+            <i class="fa-solid fa-star text-gold-400 text-xs"></i>
+            <i class="fa-solid fa-star text-gold-400 text-xs"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="relative bg-navy-800 border border-gold-500/10 rounded p-8 quote-mark card-lift reveal" style="transition-delay:0.15s">
+        <div class="pt-4">
+          <p class="text-slate-300 italic leading-relaxed mb-6">Excellent source for nautical publications. The sailing directions for the Bay of Bengal region were comprehensive and saved us significant planning time.</p>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-navy-700 rounded-full flex items-center justify-center border border-gold-500/20">
+              <i class="fa-solid fa-user text-gold-400 text-sm"></i>
+            </div>
+            <div>
+              <div class="text-white font-semibold text-sm">Capt. Priya S.</div>
+              <div class="text-gold-400 text-xs font-condensed uppercase tracking-wider">Merchant Marine Officer</div>
+            </div>
+          </div>
+          <div class="flex gap-1 mt-3">
+            <i class="fa-solid fa-star text-gold-400 text-xs"></i>
+            <i class="fa-solid fa-star text-gold-400 text-xs"></i>
+            <i class="fa-solid fa-star text-gold-400 text-xs"></i>
+            <i class="fa-solid fa-star text-gold-400 text-xs"></i>
+            <i class="fa-solid fa-star text-gold-400 text-xs"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="relative bg-navy-800 border border-gold-500/10 rounded p-8 quote-mark card-lift reveal" style="transition-delay:0.3s">
+        <div class="pt-4">
+          <p class="text-slate-300 italic leading-relaxed mb-6">As a coastal fisherman turned fishing fleet operator, having accurate coastal charts has made our operations much safer and more fuel-efficient. Highly recommended.</p>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-navy-700 rounded-full flex items-center justify-center border border-gold-500/20">
+              <i class="fa-solid fa-user text-gold-400 text-sm"></i>
+            </div>
+            <div>
+              <div class="text-white font-semibold text-sm">Mr. Anand K.</div>
+              <div class="text-gold-400 text-xs font-condensed uppercase tracking-wider">Fishing Fleet Operator, Kerala</div>
+            </div>
+          </div>
+          <div class="flex gap-1 mt-3">
+            <i class="fa-solid fa-star text-gold-400 text-xs"></i>
+            <i class="fa-solid fa-star text-gold-400 text-xs"></i>
+            <i class="fa-solid fa-star text-gold-400 text-xs"></i>
+            <i class="fa-solid fa-star text-gold-400 text-xs"></i>
+            <i class="fa-solid fa-star-half-stroke text-gold-400 text-xs"></i>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     CONTACT & FOOTER
+════════════════════════════════════════════ -->
+<section id="contact" class="bg-navy-950 map-grid-dense py-20 lg:py-28">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="text-center mb-14 reveal">
+      <span class="font-condensed text-gold-400 uppercase tracking-widest text-sm">Get In Touch</span>
+      <h2 class="font-display font-bold text-white text-3xl lg:text-4xl mt-3 mb-4">
+        Chart Your Course <span class="text-gold-400">With Us</span>
+      </h2>
+      <div class="gold-divider w-24 mx-auto"></div>
+    </div>
+
+    <div class="grid lg:grid-cols-2 gap-14">
+
+      <!-- Contact Info -->
+      <div class="reveal-left">
+        <h3 class="font-display font-semibold text-white text-2xl mb-7">Contact Information</h3>
+        <div class="space-y-5 mb-10">
+          <div class="flex items-start gap-4">
+            <div class="w-11 h-11 bg-navy-800 border border-gold-500/20 rounded flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-phone text-gold-400"></i>
+            </div>
+            <div>
+              <div class="text-slate-400 text-xs font-condensed uppercase tracking-wider mb-1">Phone</div>
+              <a href="tel:+919742172874" class="text-white hover:text-gold-300 transition-colors font-medium">+91-97421 72874</a>
+            </div>
+          </div>
+          <div class="flex items-start gap-4">
+            <div class="w-11 h-11 bg-navy-800 border border-gold-500/20 rounded flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-envelope text-gold-400"></i>
+            </div>
+            <div>
+              <div class="text-slate-400 text-xs font-condensed uppercase tracking-wider mb-1">Email</div>
+              <a href="mailto:abhisek@shellbackmarines.com" class="text-white hover:text-gold-300 transition-colors font-medium">abhisek@shellbackmarines.com</a>
+            </div>
+          </div>
+          <div class="flex items-start gap-4">
+            <div class="w-11 h-11 bg-navy-800 border border-gold-500/20 rounded flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-location-dot text-gold-400"></i>
+            </div>
+            <div>
+              <div class="text-slate-400 text-xs font-condensed uppercase tracking-wider mb-1">Address</div>
+              <address class="text-white not-italic leading-relaxed">
+                Oodlabari Bidhanpally PO Manabari<br/>
+                Dist. Jalpaiguri, WB — 735 222<br/>
+                India
+              </address>
+            </div>
+          </div>
+        </div>
+
+        <!-- India Badge -->
+        <div class="flex items-center gap-3 text-slate-400 text-sm border-t border-white/5 pt-7">
+          <i class="fa-solid fa-flag text-orange-400 text-xl"></i>
+          <span>Proudly designed for the Guardians of the Nation and warriors of the seas.</span>
+        </div>
+      </div>
+
+      <!-- Contact Form -->
+      <div class="reveal-right">
+        <form class="space-y-5" onsubmit="handleSubmit(event)">
+          <div class="grid sm:grid-cols-2 gap-5">
+            <div>
+              <label class="block text-slate-400 text-xs font-condensed uppercase tracking-wider mb-2">Your Name</label>
+              <input type="text" placeholder="Capt. Full Name" class="w-full bg-navy-800 border border-gold-500/20 focus:border-gold-400 outline-none text-white placeholder-slate-500 px-4 py-3 rounded text-sm transition-colors" />
+            </div>
+            <div>
+              <label class="block text-slate-400 text-xs font-condensed uppercase tracking-wider mb-2">Email Address</label>
+              <input type="email" placeholder="you@example.com" class="w-full bg-navy-800 border border-gold-500/20 focus:border-gold-400 outline-none text-white placeholder-slate-500 px-4 py-3 rounded text-sm transition-colors" />
+            </div>
+          </div>
+          <div>
+            <label class="block text-slate-400 text-xs font-condensed uppercase tracking-wider mb-2">Subject</label>
+            <input type="text" placeholder="Chart enquiry / Product query" class="w-full bg-navy-800 border border-gold-500/20 focus:border-gold-400 outline-none text-white placeholder-slate-500 px-4 py-3 rounded text-sm transition-colors" />
+          </div>
+          <div>
+            <label class="block text-slate-400 text-xs font-condensed uppercase tracking-wider mb-2">Message</label>
+            <textarea rows="5" placeholder="Describe what charts or products you need..." class="w-full bg-navy-800 border border-gold-500/20 focus:border-gold-400 outline-none text-white placeholder-slate-500 px-4 py-3 rounded text-sm transition-colors resize-none"></textarea>
+          </div>
+          <button type="submit" class="w-full bg-gold-500 hover:bg-gold-400 text-navy-950 font-condensed font-bold uppercase tracking-wider py-4 transition-all hover:scale-[1.02] rounded-sm text-sm">
+            <i class="fa-solid fa-paper-plane mr-2"></i>Send Message
+          </button>
+          <p id="form-success" class="hidden text-green-400 text-sm text-center font-condensed"><i class="fa-solid fa-check-circle mr-1"></i>Message sent! We'll be in touch shortly.</p>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════ -->
+<footer class="bg-navy-950 border-t border-gold-500/15">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-10">
+
+      <!-- Brand -->
+      <div class="lg:col-span-1">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-10 h-10 rounded-full border-2 border-gold-500 flex items-center justify-center bg-navy-800">
+            <i class="fa-solid fa-anchor text-gold-400 text-lg"></i>
+          </div>
+          <div>
+            <div class="font-display font-bold text-white text-base">Shellback Marines</div>
+            <div class="coord-text">SINCE 2023</div>
+          </div>
+        </div>
+        <p class="text-slate-400 text-sm leading-relaxed mb-5">
+          Premier source for hydrographic products and nautical charts. Serving mariners, naval forces, and maritime professionals across India.
+        </p>
+        <div class="flex gap-3">
+          <a href="#" class="w-9 h-9 bg-navy-800 border border-gold-500/20 hover:border-gold-400 rounded flex items-center justify-center text-slate-400 hover:text-gold-300 transition-all">
+            <i class="fa-brands fa-facebook-f text-sm"></i>
+          </a>
+          <a href="#" class="w-9 h-9 bg-navy-800 border border-gold-500/20 hover:border-gold-400 rounded flex items-center justify-center text-slate-400 hover:text-gold-300 transition-all">
+            <i class="fa-brands fa-instagram text-sm"></i>
+          </a>
+          <a href="#" class="w-9 h-9 bg-navy-800 border border-gold-500/20 hover:border-gold-400 rounded flex items-center justify-center text-slate-400 hover:text-gold-300 transition-all">
+            <i class="fa-brands fa-linkedin-in text-sm"></i>
+          </a>
+          <a href="https://wa.me/919742172874" class="w-9 h-9 bg-navy-800 border border-gold-500/20 hover:border-gold-400 rounded flex items-center justify-center text-slate-400 hover:text-gold-300 transition-all">
+            <i class="fa-brands fa-whatsapp text-sm"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Links -->
+      <div>
+        <h4 class="font-condensed font-bold text-white uppercase tracking-wider text-sm mb-5">Quick Links</h4>
+        <ul class="space-y-2.5">
+          <li><a href="index.html" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-gold-500/50 text-xs"></i>Home</a></li>
+          <li><a href="about.html" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-gold-500/50 text-xs"></i>About Us</a></li>
+          <li><a href="products.html" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-gold-500/50 text-xs"></i>Products</a></li>
+          <li><a href="index.html#why-us" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-gold-500/50 text-xs"></i>Why Choose Us</a></li>
+          <li><a href="contact.html" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-gold-500/50 text-xs"></i>Contact Us</a></li>
+        </ul>
+      </div>
+
+      <!-- Categories -->
+      <div>
+        <h4 class="font-condensed font-bold text-white uppercase tracking-wider text-sm mb-5">Categories</h4>
+        <ul class="space-y-2.5">
+          <li><a href="products.html" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-map text-gold-500/50 text-xs"></i>Paper Charts</a></li>
+          <li><a href="products.html" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-book text-gold-500/50 text-xs"></i>Nautical Publications</a></li>
+          <li><a href="products.html" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-compass text-gold-500/50 text-xs"></i>Navigational Instruments</a></li>
+          <li><a href="products.html" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chart-area text-gold-500/50 text-xs"></i>Hydrographic Reports</a></li>
+        </ul>
+      </div>
+
+      <!-- Policies -->
+      <div>
+        <h4 class="font-condensed font-bold text-white uppercase tracking-wider text-sm mb-5">Policies</h4>
+        <ul class="space-y-2.5">
+          <li><a href="#" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-gold-500/50 text-xs"></i>Shipping & Returns</a></li>
+          <li><a href="#" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-gold-500/50 text-xs"></i>Privacy Policy</a></li>
+          <li><a href="#" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-gold-500/50 text-xs"></i>Terms & Conditions</a></li>
+          <li><a href="#" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-gold-500/50 text-xs"></i>My Account</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="border-t border-white/5 mt-12 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p class="text-slate-500 text-sm">© 2025 Shellback Marines. All rights reserved.</p>
+      <p class="text-slate-600 text-xs font-condensed uppercase tracking-wider">Guardians of the Nation · Warriors of the Seas</p>
+    </div>
+  </div>
+</footer>
+
+<!-- Scroll to Top -->
+<button id="scroll-top" class="fixed bottom-6 right-6 w-12 h-12 bg-gold-500 hover:bg-gold-400 text-navy-950 rounded-full shadow-lg flex items-center justify-center opacity-0 translate-y-4 transition-all duration-300 z-40" aria-label="Scroll to top">
+  <i class="fa-solid fa-chevron-up"></i>
+</button>
+
+<!-- ════════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════════ -->
+<script>
+  // ── Mobile menu toggle ──
+  const menuBtn = document.getElementById('menu-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const menuIcon = document.getElementById('menu-icon');
+  menuBtn.addEventListener('click', () => {
+    mobileMenu.classList.toggle('open');
+    menuIcon.className = mobileMenu.classList.contains('open')
+      ? 'fa-solid fa-xmark' : 'fa-solid fa-bars';
+  });
+  // Close on link click
+  mobileMenu.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      mobileMenu.classList.remove('open');
+      menuIcon.className = 'fa-solid fa-bars';
+    });
+  });
+
+  // ── Scroll-reveal ──
+  const revealEls = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        revealObserver.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  revealEls.forEach(el => revealObserver.observe(el));
+
+  // ── Scroll-to-top button ──
+  const scrollTopBtn = document.getElementById('scroll-top');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 400) {
+      scrollTopBtn.style.opacity = '1';
+      scrollTopBtn.style.transform = 'translateY(0)';
+    } else {
+      scrollTopBtn.style.opacity = '0';
+      scrollTopBtn.style.transform = 'translateY(1rem)';
+    }
+  });
+  scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+  // ── Navbar shrink on scroll ──
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 60) {
+      navbar.classList.add('py-0');
+    } else {
+      navbar.classList.remove('py-0');
+    }
+  });
+
+  // ── Product category filter ──
+  function filterCategory(cat, btn) {
+    // Update button styles
+    document.querySelectorAll('.category-pill').forEach(b => {
+      b.style.background = '';
+      b.style.color = '';
+      b.style.borderColor = '';
+    });
+    btn.style.background = 'linear-gradient(135deg, #c8922a, #d4a843)';
+    btn.style.color = '#020b18';
+    btn.style.borderColor = 'transparent';
+
+    // Filter cards
+    document.querySelectorAll('.product-card').forEach(card => {
+      if (cat === 'all' || card.dataset.cat === cat) {
+        card.style.display = '';
+        setTimeout(() => card.style.opacity = '1', 50);
+      } else {
+        card.style.opacity = '0';
+        setTimeout(() => card.style.display = 'none', 300);
+      }
+    });
+  }
+
+  // Activate first pill by default
+  document.querySelector('.category-pill').dispatchEvent(new MouseEvent('click'));
+
+  // ── Contact form ──
+  function handleSubmit(e) {
+    e.preventDefault();
+    const success = document.getElementById('form-success');
+    success.classList.remove('hidden');
+    e.target.reset();
+    setTimeout(() => success.classList.add('hidden'), 5000);
+  }
+</script>
+
+</body>
+</html>

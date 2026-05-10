@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Products – Shellback Marines</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: {
+              950: '#020b18',
+              900: '#041424',
+              800: '#072238',
+              700: '#0c3454',
+              600: '#114a76',
+              500: '#155f98',
+            },
+            ocean: {
+              500: '#0e7490',
+              400: '#0891b2',
+              300: '#22d3ee',
+              200: '#a5f3fc',
+            },
+            gold: {
+              500: '#c8922a',
+              400: '#d4a843',
+              300: '#e8c76a',
+              200: '#fde68a',
+            },
+          },
+          fontFamily: {
+            display: ['Playfair Display', 'serif'],
+            body: ['Barlow', 'sans-serif'],
+            condensed: ['Barlow Condensed', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Barlow', sans-serif; background: #020b18; color: #e2e8f0; overflow-x: hidden; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #041424; }
+    ::-webkit-scrollbar-thumb { background: #c8922a; border-radius: 3px; }
+
+    .map-grid {
+      background-image:
+        linear-gradient(rgba(200,146,42,0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(200,146,42,0.07) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    .page-hero {
+      background-image:
+        linear-gradient(to bottom, rgba(2,11,24,0.5) 0%, rgba(2,11,24,0.75) 60%, rgba(2,11,24,1) 100%),
+        url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1800&q=80');
+      background-size: cover;
+      background-position: center;
+    }
+
+    .glass-nav {
+      backdrop-filter: blur(16px) saturate(160%);
+      -webkit-backdrop-filter: blur(16px) saturate(160%);
+      background: rgba(2,11,24,0.78);
+      border-bottom: 1px solid rgba(200,146,42,0.18);
+    }
+
+    .gold-divider {
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #c8922a, transparent);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(32px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes spin-slow { to { transform: rotate(360deg); } }
+    .compass-spin { animation: spin-slow 30s linear infinite; }
+    .fade-up  { animation: fadeUp 0.9s ease both; }
+    .delay-1  { animation-delay: 0.15s; }
+    .delay-2  { animation-delay: 0.35s; }
+    .delay-3  { animation-delay: 0.55s; }
+
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    .nav-link { position: relative; }
+    .nav-link::after {
+      content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 1px;
+      background: #c8922a; transition: width 0.3s ease;
+    }
+    .nav-link:hover::after { width: 100%; }
+    .nav-link.active-page::after { width: 100%; }
+
+    .coord-text {
+      font-family: 'Barlow Condensed', sans-serif;
+      letter-spacing: 0.15em;
+      color: rgba(200,146,42,0.5);
+      font-size: 0.65rem;
+    }
+
+    #mobile-menu { transition: max-height 0.4s ease, opacity 0.4s ease; max-height: 0; opacity: 0; overflow: hidden; }
+    #mobile-menu.open { max-height: 500px; opacity: 1; }
+
+    /* Tab system */
+    .tab-btn {
+      position: relative;
+      transition: all 0.3s ease;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+    }
+    .tab-btn.active {
+      color: #020b18;
+      background: #c8922a;
+    }
+    .tab-btn:not(.active) {
+      color: #94a3b8;
+      background: rgba(7,34,56,0.6);
+    }
+    .tab-btn:not(.active):hover {
+      color: #d4a843;
+      background: rgba(7,34,56,0.9);
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* Product card */
+    .product-card {
+      background: rgba(7,34,56,0.5);
+      border: 1px solid rgba(200,146,42,0.12);
+      transition: all 0.3s ease;
+    }
+    .product-card:hover {
+      border-color: rgba(200,146,42,0.45);
+      background: rgba(12,52,84,0.7);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(200,146,42,0.2);
+    }
+    .product-card .img-wrap {
+      overflow: hidden;
+    }
+    .product-card .img-wrap img {
+      transition: transform 0.5s ease;
+    }
+    .product-card:hover .img-wrap img {
+      transform: scale(1.07);
+    }
+
+    /* Source section header */
+    .source-header {
+      border-left: 3px solid #c8922a;
+    }
+
+    /* Coming soon badge */
+    .coming-soon-badge {
+      background: linear-gradient(135deg, rgba(7,34,56,0.8), rgba(12,52,84,0.8));
+      border: 1px solid rgba(200,146,42,0.2);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════
+     NAVBAR
+════════════════════════════════════════════ -->
+<header id="navbar" class="fixed top-0 left-0 right-0 z-50 glass-nav transition-all duration-300">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16 lg:h-20">
+
+      <!-- Logo -->
+      <a href="index.html" class="flex items-center gap-3 group">
+        <div class="w-10 h-10 lg:w-12 lg:h-12 rounded-full border-2 border-gold-500 flex items-center justify-center bg-navy-800 group-hover:border-gold-300 transition-colors">
+          <i class="fa-solid fa-anchor text-gold-500 text-lg lg:text-xl group-hover:text-gold-300 transition-colors"></i>
+        </div>
+        <div>
+          <div class="font-display font-bold text-white text-base lg:text-lg leading-tight">Shellback Marines</div>
+          <div class="coord-text hidden sm:block">HYDROGRAPHIC PRODUCTS & NAUTICAL CHARTS</div>
+        </div>
+      </a>
+
+      <!-- Desktop Nav -->
+      <nav class="hidden lg:flex items-center gap-8">
+        <a href="index.html" class="nav-link text-slate-300 hover:text-gold-300 font-body text-sm font-medium transition-colors">Home</a>
+        <a href="about.html" class="nav-link text-slate-300 hover:text-gold-300 font-body text-sm font-medium transition-colors">About Us</a>
+        <a href="products.html" class="nav-link active-page text-gold-300 font-body text-sm font-medium transition-colors">Products</a>
+        <a href="index.html#why-us" class="nav-link text-slate-300 hover:text-gold-300 font-body text-sm font-medium transition-colors">Why Us</a>
+        <a href="contact.html" class="nav-link text-slate-300 hover:text-gold-300 font-body text-sm font-medium transition-colors">Contact</a>
+        <a href="shop.html" class="bg-gold-500 hover:bg-gold-400 text-navy-950 font-condensed font-bold text-sm px-5 py-2.5 uppercase tracking-wider transition-colors rounded-sm">
+          <i class="fa-solid fa-store mr-1.5"></i>Shop Now
+        </a>
+      </nav>
+
+      <!-- Mobile Toggle -->
+      <button id="menu-btn" class="lg:hidden text-gold-400 text-2xl p-2" aria-label="Toggle menu">
+        <i id="menu-icon" class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="lg:hidden bg-navy-900 border-t border-gold-500/20">
+    <div class="px-4 py-4 flex flex-col gap-1">
+      <a href="index.html" class="text-slate-300 hover:text-gold-300 py-2.5 border-b border-white/5 font-body">Home</a>
+      <a href="about.html" class="text-slate-300 hover:text-gold-300 py-2.5 border-b border-white/5 font-body">About Us</a>
+      <a href="products.html" class="text-gold-300 py-2.5 border-b border-white/5 font-body">Products</a>
+      <a href="index.html#why-us" class="text-slate-300 hover:text-gold-300 py-2.5 border-b border-white/5 font-body">Why Us</a>
+      <a href="contact.html" class="text-slate-300 hover:text-gold-300 py-2.5 border-b border-white/5 font-body">Contact</a>
+      <a href="shop.html" class="mt-3 bg-gold-500 text-navy-950 font-condensed font-bold text-sm px-5 py-3 uppercase tracking-wider text-center rounded-sm">
+        <i class="fa-solid fa-store mr-1.5"></i>Shop Now
+      </a>
+    </div>
+  </div>
+</header>
+
+
+<!-- ════════════════════════════════════════════
+     PAGE HERO
+════════════════════════════════════════════ -->
+<section class="relative page-hero map-grid pt-32 pb-20 lg:pt-44 lg:pb-28 flex items-center">
+  <div class="absolute top-20 right-8 opacity-10 compass-spin" aria-hidden="true">
+    <i class="fa-solid fa-compass text-gold-400 text-8xl lg:text-9xl"></i>
+  </div>
+  <div class="absolute bottom-10 left-6 coord-text">N 22°34.8′ / E 88°21.6′ — JALPAIGURI, WB</div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+    <nav class="flex items-center gap-2 text-xs font-condensed uppercase tracking-wider text-slate-500 mb-6 fade-up">
+      <a href="index.html" class="hover:text-gold-400 transition-colors">Home</a>
+      <i class="fa-solid fa-chevron-right text-gold-500/40 text-[10px]"></i>
+      <span class="text-gold-400">Products</span>
+    </nav>
+
+    <div class="max-w-2xl">
+      <div class="flex items-center gap-3 mb-5 fade-up">
+        <div class="h-px w-10 bg-gold-500"></div>
+        <span class="coord-text text-gold-400 tracking-widest text-xs uppercase font-condensed">Our Catalogue</span>
+      </div>
+      <h1 class="font-display font-black text-white text-4xl lg:text-6xl leading-tight mb-5 fade-up delay-1">
+        Nautical <span class="text-gold-400">Products</span>
+      </h1>
+      <p class="text-slate-300 text-lg leading-relaxed fade-up delay-2">
+        Official distributor of hydrographic charts, ENCs, and nautical publications from India's National Hydrographic Office and the United Kingdom's Admiralty.
+      </p>
+    </div>
+  </div>
+  <div class="absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-t from-navy-950 to-transparent pointer-events-none"></div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     PRODUCT LISTINGS
+════════════════════════════════════════════ -->
+<section class="bg-navy-950 py-16 lg:py-24">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <!-- ── NHO INDIA SECTION ── -->
+    <div class="reveal mb-20">
+
+      <!-- Source header -->
+      <div class="source-header pl-5 mb-10">
+        <p class="coord-text text-gold-400 uppercase tracking-widest mb-1">Official Source</p>
+        <h2 class="font-display font-bold text-white text-2xl lg:text-3xl">
+          National Hydrographic Office
+          <span class="block text-gold-400 text-xl lg:text-2xl">Dehradun, India</span>
+        </h2>
+      </div>
+
+      <!-- NHO Tab bar -->
+      <div class="flex rounded overflow-hidden border border-gold-500/20 mb-8 max-w-2xl" id="nho-tabs" role="tablist">
+        <button class="tab-btn active flex-1 py-3 px-4 flex items-center justify-center gap-2" data-tab="nho-paper" role="tab" aria-selected="true">
+          <i class="fa-solid fa-map-location-dot"></i>
+          <span>Paper Charts</span>
+        </button>
+        <button class="tab-btn flex-1 py-3 px-4 flex items-center justify-center gap-2 border-x border-gold-500/20" data-tab="nho-encs" role="tab" aria-selected="false">
+          <i class="fa-solid fa-globe"></i>
+          <span>ENCS</span>
+        </button>
+        <button class="tab-btn flex-1 py-3 px-4 flex items-center justify-center gap-2" data-tab="nho-publications" role="tab" aria-selected="false">
+          <i class="fa-solid fa-book-open"></i>
+          <span>Publications</span>
+        </button>
+      </div>
+
+      <!-- NHO — Paper Charts -->
+      <div id="nho-paper" class="tab-content active">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+
+          <!-- Catalogue of Charts -->
+          <a href="https://hydrobharat.gov.in/online-catalogue-application/" target="_blank" rel="noopener"
+             class="product-card rounded overflow-hidden group">
+            <div class="img-wrap h-44">
+              <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=600&q=80"
+                   alt="Catalogue of Charts" class="w-full h-full object-cover" />
+            </div>
+            <div class="p-4">
+              <div class="flex items-center gap-2 mb-1">
+                <i class="fa-solid fa-map text-gold-400 text-xs"></i>
+                <span class="coord-text text-gold-400/70 text-[10px] uppercase tracking-widest">External Link</span>
+              </div>
+              <h3 class="font-condensed font-bold text-white text-base group-hover:text-gold-300 transition-colors leading-snug">
+                Catalogue of Charts
+              </h3>
+              <p class="text-slate-400 text-xs mt-1 leading-relaxed">Official NHO online catalogue application</p>
+              <div class="mt-3 flex items-center gap-1 text-gold-400 text-xs font-condensed uppercase tracking-wider">
+                <span>View Catalogue</span>
+                <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+              </div>
+            </div>
+          </a>
+
+          <!-- Folio 1 -->
+          <a href="https://shellbackmarines.com/product-category/indian-charts/folio-1/" target="_blank" rel="noopener"
+             class="product-card rounded overflow-hidden group">
+            <div class="img-wrap h-44">
+              <img src="https://images.unsplash.com/photo-1519672951738-0f0a68a19b71?w=600&q=80"
+                   alt="Folio 1 - Nautical Chart" class="w-full h-full object-cover" />
+            </div>
+            <div class="p-4">
+              <div class="flex items-center gap-2 mb-1">
+                <i class="fa-solid fa-layer-group text-gold-400 text-xs"></i>
+                <span class="coord-text text-gold-400/70 text-[10px] uppercase tracking-widest">Paper Chart</span>
+              </div>
+              <h3 class="font-condensed font-bold text-white text-base group-hover:text-gold-300 transition-colors leading-snug">
+                Folio 1
+              </h3>
+              <p class="text-slate-400 text-xs mt-1 leading-relaxed">Indian nautical charts — series 1</p>
+              <div class="mt-3 flex items-center gap-1 text-gold-400 text-xs font-condensed uppercase tracking-wider">
+                <span>Browse Folio</span>
+                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+              </div>
+            </div>
+          </a>
+
+          <!-- Folio 2 -->
+          <a href="https://shellbackmarines.com/product-category/paper-charts/folio-2/" target="_blank" rel="noopener"
+             class="product-card rounded overflow-hidden group">
+            <div class="img-wrap h-44">
+              <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&q=80"
+                   alt="Folio 2 - Nautical Chart" class="w-full h-full object-cover" />
+            </div>
+            <div class="p-4">
+              <div class="flex items-center gap-2 mb-1">
+                <i class="fa-solid fa-layer-group text-gold-400 text-xs"></i>
+                <span class="coord-text text-gold-400/70 text-[10px] uppercase tracking-widest">Paper Chart</span>
+              </div>
+              <h3 class="font-condensed font-bold text-white text-base group-hover:text-gold-300 transition-colors leading-snug">
+                Folio 2
+              </h3>
+              <p class="text-slate-400 text-xs mt-1 leading-relaxed">Indian nautical charts — series 2</p>
+              <div class="mt-3 flex items-center gap-1 text-gold-400 text-xs font-condensed uppercase tracking-wider">
+                <span>Browse Folio</span>
+                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+              </div>
+            </div>
+          </a>
+
+          <!-- Folio 3 -->
+          <a href="https://shellbackmarines.com/product-category/paper-charts/folio-3/" target="_blank" rel="noopener"
+             class="product-card rounded overflow-hidden group">
+            <div class="img-wrap h-44">
+              <img src="https://images.unsplash.com/photo-1548438294-1ad5d5f4f063?w=600&q=80"
+                   alt="Folio 3 - Nautical Chart" class="w-full h-full object-cover" />
+            </div>
+            <div class="p-4">
+              <div class="flex items-center gap-2 mb-1">
+                <i class="fa-solid fa-layer-group text-gold-400 text-xs"></i>
+                <span class="coord-text text-gold-400/70 text-[10px] uppercase tracking-widest">Paper Chart</span>
+              </div>
+              <h3 class="font-condensed font-bold text-white text-base group-hover:text-gold-300 transition-colors leading-snug">
+                Folio 3
+              </h3>
+              <p class="text-slate-400 text-xs mt-1 leading-relaxed">Indian nautical charts — series 3</p>
+              <div class="mt-3 flex items-center gap-1 text-gold-400 text-xs font-condensed uppercase tracking-wider">
+                <span>Browse Folio</span>
+                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+              </div>
+            </div>
+          </a>
+
+          <!-- Folio 4 -->
+          <a href="https://shellbackmarines.com/product-category/paper-charts/folio-4/" target="_blank" rel="noopener"
+             class="product-card rounded overflow-hidden group">
+            <div class="img-wrap h-44">
+              <img src="https://images.unsplash.com/photo-1569336415962-a4bd9f69c37a?w=600&q=80"
+                   alt="Folio 4 - Nautical Chart" class="w-full h-full object-cover" />
+            </div>
+            <div class="p-4">
+              <div class="flex items-center gap-2 mb-1">
+                <i class="fa-solid fa-layer-group text-gold-400 text-xs"></i>
+                <span class="coord-text text-gold-400/70 text-[10px] uppercase tracking-widest">Paper Chart</span>
+              </div>
+              <h3 class="font-condensed font-bold text-white text-base group-hover:text-gold-300 transition-colors leading-snug">
+                Folio 4
+              </h3>
+              <p class="text-slate-400 text-xs mt-1 leading-relaxed">Indian nautical charts — series 4</p>
+              <div class="mt-3 flex items-center gap-1 text-gold-400 text-xs font-condensed uppercase tracking-wider">
+                <span>Browse Folio</span>
+                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+              </div>
+            </div>
+          </a>
+
+          <!-- Folio 5 -->
+          <a href="https://shellbackmarines.com/product-category/paper-charts/folio-5/" target="_blank" rel="noopener"
+             class="product-card rounded overflow-hidden group">
+            <div class="img-wrap h-44">
+              <img src="https://images.unsplash.com/photo-1503095396549-807759245b35?w=600&q=80"
+                   alt="Folio 5 - Nautical Chart" class="w-full h-full object-cover" />
+            </div>
+            <div class="p-4">
+              <div class="flex items-center gap-2 mb-1">
+                <i class="fa-solid fa-layer-group text-gold-400 text-xs"></i>
+                <span class="coord-text text-gold-400/70 text-[10px] uppercase tracking-widest">Paper Chart</span>
+              </div>
+              <h3 class="font-condensed font-bold text-white text-base group-hover:text-gold-300 transition-colors leading-snug">
+                Folio 5
+              </h3>
+              <p class="text-slate-400 text-xs mt-1 leading-relaxed">Indian nautical charts — series 5</p>
+              <div class="mt-3 flex items-center gap-1 text-gold-400 text-xs font-condensed uppercase tracking-wider">
+                <span>Browse Folio</span>
+                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+              </div>
+            </div>
+          </a>
+
+          <!-- Folio 6 -->
+          <a href="https://shellbackmarines.com/product-category/paper-charts/folio-6/" target="_blank" rel="noopener"
+             class="product-card rounded overflow-hidden group">
+            <div class="img-wrap h-44">
+              <img src="https://images.unsplash.com/photo-1500916434205-0c77489c6cf7?w=600&q=80"
+                   alt="Folio 6 - Nautical Chart" class="w-full h-full object-cover" />
+            </div>
+            <div class="p-4">
+              <div class="flex items-center gap-2 mb-1">
+                <i class="fa-solid fa-layer-group text-gold-400 text-xs"></i>
+                <span class="coord-text text-gold-400/70 text-[10px] uppercase tracking-widest">Paper Chart</span>
+              </div>
+              <h3 class="font-condensed font-bold text-white text-base group-hover:text-gold-300 transition-colors leading-snug">
+                Folio 6
+              </h3>
+              <p class="text-slate-400 text-xs mt-1 leading-relaxed">Indian nautical charts — series 6</p>
+              <div class="mt-3 flex items-center gap-1 text-gold-400 text-xs font-condensed uppercase tracking-wider">
+                <span>Browse Folio</span>
+                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+              </div>
+            </div>
+          </a>
+
+        </div>
+      </div><!-- /nho-paper -->
+
+      <!-- NHO — ENCS -->
+      <div id="nho-encs" class="tab-content">
+        <div class="coming-soon-badge rounded-lg p-16 flex flex-col items-center justify-center text-center">
+          <div class="w-20 h-20 rounded-full border border-gold-500/30 flex items-center justify-center mb-6 bg-navy-800/50">
+            <i class="fa-solid fa-globe text-gold-400 text-3xl"></i>
+          </div>
+          <h3 class="font-display font-bold text-white text-2xl mb-3">Electronic Navigational Charts</h3>
+          <p class="text-slate-400 text-sm max-w-sm leading-relaxed mb-4">
+            ENCs from the National Hydrographic Office, India are currently being added to our catalogue.
+          </p>
+          <span class="inline-flex items-center gap-2 bg-gold-500/10 border border-gold-500/30 text-gold-300 font-condensed uppercase tracking-wider text-xs px-5 py-2 rounded-sm">
+            <i class="fa-solid fa-clock"></i> Coming Soon
+          </span>
+        </div>
+      </div><!-- /nho-encs -->
+
+      <!-- NHO — Publications -->
+      <div id="nho-publications" class="tab-content">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+
+          <a href="https://shellbackmarines.com/product-category/nautical-publications/" target="_blank" rel="noopener"
+             class="product-card rounded overflow-hidden group">
+            <div class="img-wrap h-44">
+              <img src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=600&q=80"
+                   alt="Nautical Publications" class="w-full h-full object-cover" />
+            </div>
+            <div class="p-4">
+              <div class="flex items-center gap-2 mb-1">
+                <i class="fa-solid fa-book-open text-gold-400 text-xs"></i>
+                <span class="coord-text text-gold-400/70 text-[10px] uppercase tracking-widest">Publication</span>
+              </div>
+              <h3 class="font-condensed font-bold text-white text-base group-hover:text-gold-300 transition-colors leading-snug">
+                Publications
+              </h3>
+              <p class="text-slate-400 text-xs mt-1 leading-relaxed">Official nautical publications from NHO India</p>
+              <div class="mt-3 flex items-center gap-1 text-gold-400 text-xs font-condensed uppercase tracking-wider">
+                <span>View All</span>
+                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+              </div>
+            </div>
+          </a>
+
+        </div>
+      </div><!-- /nho-publications -->
+
+    </div>
+    <!-- end NHO section -->
+
+    <div class="gold-divider my-14 reveal"></div>
+
+    <!-- ── ADMIRALTY UK SECTION ── -->
+    <div class="reveal">
+
+      <!-- Source header -->
+      <div class="source-header pl-5 mb-10">
+        <p class="coord-text text-gold-400 uppercase tracking-widest mb-1">Official Source</p>
+        <h2 class="font-display font-bold text-white text-2xl lg:text-3xl">
+          Admiralty
+          <span class="block text-gold-400 text-xl lg:text-2xl">United Kingdom</span>
+        </h2>
+      </div>
+
+      <!-- Admiralty Tab bar -->
+      <div class="flex rounded overflow-hidden border border-gold-500/20 mb-8 max-w-2xl" id="adm-tabs" role="tablist">
+        <button class="tab-btn active flex-1 py-3 px-4 flex items-center justify-center gap-2" data-tab="adm-paper" role="tab" aria-selected="true">
+          <i class="fa-solid fa-map-location-dot"></i>
+          <span>Paper Charts</span>
+        </button>
+        <button class="tab-btn flex-1 py-3 px-4 flex items-center justify-center gap-2 border-x border-gold-500/20" data-tab="adm-encs" role="tab" aria-selected="false">
+          <i class="fa-solid fa-globe"></i>
+          <span>ENCS</span>
+        </button>
+        <button class="tab-btn flex-1 py-3 px-4 flex items-center justify-center gap-2" data-tab="adm-publications" role="tab" aria-selected="false">
+          <i class="fa-solid fa-book-open"></i>
+          <span>Publications</span>
+        </button>
+      </div>
+
+      <!-- Admiralty — Paper Charts (Coming Soon) -->
+      <div id="adm-paper" class="tab-content active">
+        <div class="coming-soon-badge rounded-lg p-16 flex flex-col items-center justify-center text-center">
+          <div class="w-20 h-20 rounded-full border border-gold-500/30 flex items-center justify-center mb-6 bg-navy-800/50">
+            <i class="fa-solid fa-map-location-dot text-gold-400 text-3xl"></i>
+          </div>
+          <h3 class="font-display font-bold text-white text-2xl mb-3">Admiralty Paper Charts</h3>
+          <p class="text-slate-400 text-sm max-w-sm leading-relaxed mb-4">
+            We are onboarding Admiralty paper charts from UKHO. These will be available shortly.
+          </p>
+          <span class="inline-flex items-center gap-2 bg-gold-500/10 border border-gold-500/30 text-gold-300 font-condensed uppercase tracking-wider text-xs px-5 py-2 rounded-sm">
+            <i class="fa-solid fa-clock"></i> Coming Soon
+          </span>
+        </div>
+      </div>
+
+      <!-- Admiralty — ENCS (Coming Soon) -->
+      <div id="adm-encs" class="tab-content">
+        <div class="coming-soon-badge rounded-lg p-16 flex flex-col items-center justify-center text-center">
+          <div class="w-20 h-20 rounded-full border border-gold-500/30 flex items-center justify-center mb-6 bg-navy-800/50">
+            <i class="fa-solid fa-globe text-gold-400 text-3xl"></i>
+          </div>
+          <h3 class="font-display font-bold text-white text-2xl mb-3">Admiralty ENCs</h3>
+          <p class="text-slate-400 text-sm max-w-sm leading-relaxed mb-4">
+            Electronic Navigational Charts from UKHO's Admiralty collection — coming soon to Shellback Marines.
+          </p>
+          <span class="inline-flex items-center gap-2 bg-gold-500/10 border border-gold-500/30 text-gold-300 font-condensed uppercase tracking-wider text-xs px-5 py-2 rounded-sm">
+            <i class="fa-solid fa-clock"></i> Coming Soon
+          </span>
+        </div>
+      </div>
+
+      <!-- Admiralty — Publications (Coming Soon) -->
+      <div id="adm-publications" class="tab-content">
+        <div class="coming-soon-badge rounded-lg p-16 flex flex-col items-center justify-center text-center">
+          <div class="w-20 h-20 rounded-full border border-gold-500/30 flex items-center justify-center mb-6 bg-navy-800/50">
+            <i class="fa-solid fa-book-open text-gold-400 text-3xl"></i>
+          </div>
+          <h3 class="font-display font-bold text-white text-2xl mb-3">Admiralty Publications</h3>
+          <p class="text-slate-400 text-sm max-w-sm leading-relaxed mb-4">
+            Official Admiralty publications and nautical almanacs will be listed here soon.
+          </p>
+          <span class="inline-flex items-center gap-2 bg-gold-500/10 border border-gold-500/30 text-gold-300 font-condensed uppercase tracking-wider text-xs px-5 py-2 rounded-sm">
+            <i class="fa-solid fa-clock"></i> Coming Soon
+          </span>
+        </div>
+      </div>
+
+    </div>
+    <!-- end Admiralty section -->
+
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     WHY ORDER FROM US
+════════════════════════════════════════════ -->
+<section class="relative py-20 lg:py-28 bg-navy-900 map-grid">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-14 reveal">
+      <div class="flex items-center justify-center gap-3 mb-4">
+        <div class="h-px w-10 bg-gold-500"></div>
+        <span class="coord-text text-gold-400 tracking-widest text-xs uppercase font-condensed">Why Choose Us</span>
+        <div class="h-px w-10 bg-gold-500"></div>
+      </div>
+      <h2 class="font-display font-bold text-white text-3xl lg:text-4xl">
+        The Shellback <span class="text-gold-400">Advantage</span>
+      </h2>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+      <div class="reveal bg-navy-800/50 border border-gold-500/15 hover:border-gold-500/35 rounded p-6 text-center transition-all duration-300 hover:bg-navy-700/50">
+        <div class="w-14 h-14 bg-gold-500/10 border border-gold-500/30 rounded-full flex items-center justify-center mx-auto mb-5">
+          <i class="fa-solid fa-certificate text-gold-400 text-xl"></i>
+        </div>
+        <h3 class="font-condensed font-bold text-white uppercase tracking-wide text-sm mb-3">Authorised Distributor</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">Official reseller of NHO India and Admiralty products, ensuring authentic charts and publications.</p>
+      </div>
+
+      <div class="reveal bg-navy-800/50 border border-gold-500/15 hover:border-gold-500/35 rounded p-6 text-center transition-all duration-300 hover:bg-navy-700/50">
+        <div class="w-14 h-14 bg-gold-500/10 border border-gold-500/30 rounded-full flex items-center justify-center mx-auto mb-5">
+          <i class="fa-solid fa-truck-fast text-gold-400 text-xl"></i>
+        </div>
+        <h3 class="font-condensed font-bold text-white uppercase tracking-wide text-sm mb-3">Fast Dispatch</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">Orders processed and dispatched promptly with tracked shipping across India and internationally.</p>
+      </div>
+
+      <div class="reveal bg-navy-800/50 border border-gold-500/15 hover:border-gold-500/35 rounded p-6 text-center transition-all duration-300 hover:bg-navy-700/50">
+        <div class="w-14 h-14 bg-gold-500/10 border border-gold-500/30 rounded-full flex items-center justify-center mx-auto mb-5">
+          <i class="fa-solid fa-shield-halved text-gold-400 text-xl"></i>
+        </div>
+        <h3 class="font-condensed font-bold text-white uppercase tracking-wide text-sm mb-3">Regulatory Compliant</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">All products meet maritime authority standards and comply with SOLAS and COLREGS requirements.</p>
+      </div>
+
+      <div class="reveal bg-navy-800/50 border border-gold-500/15 hover:border-gold-500/35 rounded p-6 text-center transition-all duration-300 hover:bg-navy-700/50">
+        <div class="w-14 h-14 bg-gold-500/10 border border-gold-500/30 rounded-full flex items-center justify-center mx-auto mb-5">
+          <i class="fa-solid fa-headset text-gold-400 text-xl"></i>
+        </div>
+        <h3 class="font-condensed font-bold text-white uppercase tracking-wide text-sm mb-3">Expert Support</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">Our team of maritime professionals helps you find the right charts and publications for your voyage.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     CTA BANNER
+════════════════════════════════════════════ -->
+<section class="relative py-20 overflow-hidden">
+  <div class="absolute inset-0">
+    <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1800&q=80" alt="Ocean background" class="w-full h-full object-cover opacity-15" />
+    <div class="absolute inset-0 bg-gradient-to-r from-navy-950 via-navy-900/90 to-navy-950"></div>
+  </div>
+  <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center reveal">
+    <div class="w-16 h-16 bg-gold-500/10 border border-gold-500/30 rounded-full flex items-center justify-center mx-auto mb-6">
+      <i class="fa-solid fa-ship text-gold-400 text-2xl"></i>
+    </div>
+    <h2 class="font-display font-bold text-white text-3xl lg:text-5xl mb-5 leading-tight">
+      Need Help Finding <span class="text-gold-400">the Right Chart?</span>
+    </h2>
+    <p class="text-slate-400 text-lg mb-10 max-w-xl mx-auto leading-relaxed">
+      Our team is ready to assist mariners, naval forces, and maritime professionals with any product enquiry.
+    </p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+      <a href="shop.html" class="bg-gold-500 hover:bg-gold-400 text-navy-950 font-condensed font-bold uppercase tracking-wider px-10 py-4 transition-all hover:scale-105 rounded-sm text-sm">
+        <i class="fa-solid fa-store mr-2"></i>Browse the Shop
+      </a>
+      <a href="contact.html" class="border border-gold-500/50 hover:border-gold-400 text-gold-300 font-condensed font-bold uppercase tracking-wider px-10 py-4 transition-all hover:bg-gold-500/10 rounded-sm text-sm">
+        <i class="fa-solid fa-envelope mr-2"></i>Contact Us
+      </a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════ -->
+<footer class="bg-navy-950 border-t border-gold-500/15">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-10">
+
+      <!-- Brand -->
+      <div class="lg:col-span-1">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-10 h-10 rounded-full border-2 border-gold-500 flex items-center justify-center bg-navy-800">
+            <i class="fa-solid fa-anchor text-gold-400 text-lg"></i>
+          </div>
+          <div>
+            <div class="font-display font-bold text-white text-base">Shellback Marines</div>
+            <div class="coord-text">SINCE 2023</div>
+          </div>
+        </div>
+        <p class="text-slate-400 text-sm leading-relaxed mb-5">
+          Premier source for hydrographic products and nautical charts. Serving mariners, naval forces, and maritime professionals across India.
+        </p>
+        <div class="flex gap-3">
+          <a href="#" class="w-9 h-9 bg-navy-800 border border-gold-500/20 hover:border-gold-400 rounded flex items-center justify-center text-slate-400 hover:text-gold-300 transition-all">
+            <i class="fa-brands fa-facebook-f text-sm"></i>
+          </a>
+          <a href="#" class="w-9 h-9 bg-navy-800 border border-gold-500/20 hover:border-gold-400 rounded flex items-center justify-center text-slate-400 hover:text-gold-300 transition-all">
+            <i class="fa-brands fa-instagram text-sm"></i>
+          </a>
+          <a href="#" class="w-9 h-9 bg-navy-800 border border-gold-500/20 hover:border-gold-400 rounded flex items-center justify-center text-slate-400 hover:text-gold-300 transition-all">
+            <i class="fa-brands fa-linkedin-in text-sm"></i>
+          </a>
+          <a href="https://wa.me/919742172874" class="w-9 h-9 bg-navy-800 border border-gold-500/20 hover:border-gold-400 rounded flex items-center justify-center text-slate-400 hover:text-gold-300 transition-all">
+            <i class="fa-brands fa-whatsapp text-sm"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Links -->
+      <div>
+        <h4 class="font-condensed font-bold text-white uppercase tracking-wider text-sm mb-5">Quick Links</h4>
+        <ul class="space-y-2.5">
+          <li><a href="index.html" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-gold-500/50 text-xs"></i>Home</a></li>
+          <li><a href="about.html" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-gold-500/50 text-xs"></i>About Us</a></li>
+          <li><a href="products.html" class="text-gold-300 text-sm flex items-center gap-2"><i class="fa-solid fa-chevron-right text-gold-500/50 text-xs"></i>Products</a></li>
+          <li><a href="index.html#why-us" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-gold-500/50 text-xs"></i>Why Choose Us</a></li>
+          <li><a href="contact.html" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-gold-500/50 text-xs"></i>Contact Us</a></li>
+        </ul>
+      </div>
+
+      <!-- Categories -->
+      <div>
+        <h4 class="font-condensed font-bold text-white uppercase tracking-wider text-sm mb-5">Categories</h4>
+        <ul class="space-y-2.5">
+          <li><a href="#" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-map text-gold-500/50 text-xs"></i>Paper Charts</a></li>
+          <li><a href="#" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-globe text-gold-500/50 text-xs"></i>ENCS</a></li>
+          <li><a href="#" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-book text-gold-500/50 text-xs"></i>Nautical Publications</a></li>
+        </ul>
+      </div>
+
+      <!-- Contact -->
+      <div>
+        <h4 class="font-condensed font-bold text-white uppercase tracking-wider text-sm mb-5">Contact</h4>
+        <ul class="space-y-4">
+          <li class="flex items-start gap-3">
+            <i class="fa-solid fa-phone text-gold-400 mt-0.5 flex-shrink-0 text-sm"></i>
+            <a href="tel:+919742172874" class="text-slate-400 hover:text-gold-300 text-sm transition-colors">+91-97421 72874</a>
+          </li>
+          <li class="flex items-start gap-3">
+            <i class="fa-solid fa-envelope text-gold-400 mt-0.5 flex-shrink-0 text-sm"></i>
+            <a href="mailto:abhisek@shellbackmarines.com" class="text-slate-400 hover:text-gold-300 text-sm transition-colors break-all">abhisek@shellbackmarines.com</a>
+          </li>
+          <li class="flex items-start gap-3">
+            <i class="fa-solid fa-location-dot text-gold-400 mt-0.5 flex-shrink-0 text-sm"></i>
+            <address class="text-slate-400 not-italic text-sm leading-relaxed">Oodlabari Bidhanpally PO Manabari, Dist Jalpaiguri, WB 735222</address>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="border-t border-white/5 mt-12 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p class="text-slate-500 text-sm">© 2025 Shellback Marines. All rights reserved.</p>
+      <p class="text-slate-600 text-xs font-condensed uppercase tracking-wider">Guardians of the Nation · Warriors of the Seas</p>
+    </div>
+  </div>
+</footer>
+
+<!-- Scroll to Top -->
+<button id="scroll-top" class="fixed bottom-6 right-6 w-12 h-12 bg-gold-500 hover:bg-gold-400 text-navy-950 rounded-full shadow-lg flex items-center justify-center opacity-0 translate-y-4 transition-all duration-300 z-40" aria-label="Scroll to top">
+  <i class="fa-solid fa-chevron-up"></i>
+</button>
+
+
+<!-- ════════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════════ -->
+<script>
+  // ── Mobile menu ──
+  const menuBtn = document.getElementById('menu-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const menuIcon = document.getElementById('menu-icon');
+  menuBtn.addEventListener('click', () => {
+    mobileMenu.classList.toggle('open');
+    menuIcon.className = mobileMenu.classList.contains('open')
+      ? 'fa-solid fa-xmark' : 'fa-solid fa-bars';
+  });
+  mobileMenu.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      mobileMenu.classList.remove('open');
+      menuIcon.className = 'fa-solid fa-bars';
+    });
+  });
+
+  // ── Tab logic — supports multiple independent tab groups ──
+  function initTabGroup(groupEl) {
+    const tabs = groupEl.querySelectorAll('.tab-btn');
+    tabs.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.tab;
+        tabs.forEach(b => {
+          b.classList.remove('active');
+          b.setAttribute('aria-selected', 'false');
+        });
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+        // Hide all tab contents within the nearest parent section
+        const section = groupEl.closest('.reveal') || groupEl.parentElement;
+        section.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+        const content = document.getElementById(target);
+        if (content) content.classList.add('active');
+      });
+    });
+  }
+  document.querySelectorAll('[id$="-tabs"]').forEach(initTabGroup);
+
+  // ── Scroll reveal ──
+  const revealEls = document.querySelectorAll('.reveal');
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        revealObserver.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08 });
+  revealEls.forEach(el => revealObserver.observe(el));
+
+  // ── Scroll-to-top ──
+  const scrollTopBtn = document.getElementById('scroll-top');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 400) {
+      scrollTopBtn.style.opacity = '1';
+      scrollTopBtn.style.transform = 'translateY(0)';
+    } else {
+      scrollTopBtn.style.opacity = '0';
+      scrollTopBtn.style.transform = 'translateY(1rem)';
+    }
+  });
+  scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+  // ── Navbar compact on scroll ──
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('py-0', window.scrollY > 60);
+  });
+</script>
+</body>
+</html>

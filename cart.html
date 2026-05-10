@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cart – Shellback Marines</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet" />
+  <script>tailwind.config={theme:{extend:{colors:{navy:{950:'#020b18',900:'#041424',800:'#072238',700:'#0c3454',600:'#114a76',500:'#155f98'},gold:{500:'#c8922a',400:'#d4a843',300:'#e8c76a',200:'#fde68a'}},fontFamily:{display:['Playfair Display','serif'],body:['Barlow','sans-serif'],condensed:['Barlow Condensed','sans-serif']}}}}</script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{font-family:'Barlow',sans-serif;background:#020b18;color:#e2e8f0;overflow-x:hidden;min-height:100vh}
+    ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#041424}::-webkit-scrollbar-thumb{background:#c8922a;border-radius:3px}
+    .map-grid{background-image:linear-gradient(rgba(200,146,42,.06)1px,transparent 1px),linear-gradient(90deg,rgba(200,146,42,.06)1px,transparent 1px);background-size:60px 60px}
+    .glass-nav{backdrop-filter:blur(16px) saturate(160%);-webkit-backdrop-filter:blur(16px) saturate(160%);background:rgba(2,11,24,.85);border-bottom:1px solid rgba(200,146,42,.18)}
+    .gold-divider{height:1px;background:linear-gradient(90deg,transparent,#c8922a 40%,transparent)}
+    .coord-text{font-family:'Barlow Condensed',sans-serif;letter-spacing:.15em;color:rgba(200,146,42,.5);font-size:.65rem}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+    .fade-up{animation:fadeUp .7s ease both}
+    .delay-1{animation-delay:.1s}.delay-2{animation-delay:.22s}.delay-3{animation-delay:.34s}
+    #mobile-menu{transition:max-height .4s ease,opacity .4s ease;max-height:0;opacity:0;overflow:hidden}
+    #mobile-menu.open{max-height:400px;opacity:1}
+    .nav-link{position:relative}
+    .nav-link::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1px;background:#c8922a;transition:width .3s ease}
+    .nav-link:hover::after,.nav-link.active-page::after{width:100%}
+
+    /* Cart row */
+    .cart-row{background:rgba(7,34,56,.55);border:1px solid rgba(200,146,42,.12);border-radius:3px;transition:all .3s ease}
+    .cart-row:hover{border-color:rgba(200,146,42,.3);background:rgba(12,52,84,.6)}
+
+    /* Qty controls */
+    .qty-btn{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(200,146,42,.3);border-radius:2px;background:rgba(7,34,56,.8);color:#d4a843;cursor:pointer;transition:all .2s ease;font-size:.75rem;flex-shrink:0}
+    .qty-btn:hover{background:#c8922a;color:#020b18;border-color:#c8922a}
+    .qty-input{width:40px;height:30px;text-align:center;background:rgba(7,34,56,.5);border:1px solid rgba(200,146,42,.2);color:#e2e8f0;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.85rem;border-radius:2px;outline:none}
+    .qty-input::-webkit-inner-spin-button,.qty-input::-webkit-outer-spin-button{-webkit-appearance:none}
+
+    /* Remove btn */
+    .remove-btn{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:1px solid rgba(239,68,68,.25);background:transparent;color:#ef4444;cursor:pointer;transition:all .2s ease;font-size:.7rem;flex-shrink:0}
+    .remove-btn:hover{background:#ef4444;color:#fff;border-color:#ef4444}
+
+    /* Summary card */
+    .summary-card{background:rgba(7,34,56,.7);border:1px solid rgba(200,146,42,.18);border-radius:3px}
+
+    /* Folio tag */
+    .folio-tag{font-family:'Barlow Condensed',sans-serif;font-size:.62rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:2px;white-space:nowrap}
+    .tag-folio1{background:rgba(59,130,246,.15);color:#93c5fd;border:1px solid rgba(59,130,246,.25)}
+    .tag-folio2{background:rgba(16,185,129,.15);color:#6ee7b7;border:1px solid rgba(16,185,129,.25)}
+    .tag-folio3{background:rgba(139,92,246,.15);color:#c4b5fd;border:1px solid rgba(139,92,246,.25)}
+    .tag-folio4{background:rgba(244,63,94,.15);color:#fda4af;border:1px solid rgba(244,63,94,.25)}
+    .tag-folio5{background:rgba(245,158,11,.15);color:#fcd34d;border:1px solid rgba(245,158,11,.25)}
+    .tag-folio6{background:rgba(6,182,212,.15);color:#67e8f9;border:1px solid rgba(6,182,212,.25)}
+    .tag-publications{background:rgba(200,146,42,.15);color:#e8c76a;border:1px solid rgba(200,146,42,.3)}
+    .tag-other{background:rgba(100,116,139,.15);color:#94a3b8;border:1px solid rgba(100,116,139,.25)}
+
+    /* Empty state */
+    .empty-state{opacity:0;animation:fadeUp .8s ease .2s both}
+
+    /* Btn primary */
+    .btn-primary{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px 24px;background:#c8922a;color:#020b18;font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.1em;font-size:.9rem;border-radius:2px;border:none;cursor:pointer;transition:all .25s ease}
+    .btn-primary:hover{background:#d4a843;transform:translateY(-1px);box-shadow:0 8px 24px rgba(200,146,42,.3)}
+    .btn-primary:active{transform:translateY(0)}
+
+    /* Btn secondary */
+    .btn-secondary{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px 24px;background:transparent;color:#94a3b8;font-family:'Barlow Condensed',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.1em;font-size:.85rem;border-radius:2px;border:1px solid rgba(200,146,42,.2);cursor:pointer;transition:all .25s ease}
+    .btn-secondary:hover{border-color:rgba(200,146,42,.5);color:#d4a843}
+
+    /* Toast */
+    #toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);background:#072238;border:1px solid rgba(200,146,42,.4);color:#e8c76a;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;padding:10px 22px;border-radius:2px;opacity:0;transition:all .3s ease;z-index:300;pointer-events:none;white-space:nowrap}
+    #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+    /* Coupon input */
+    .coupon-input{background:rgba(4,20,36,.8);border:1px solid rgba(200,146,42,.2);color:#e2e8f0;font-family:'Barlow',sans-serif;font-size:.85rem;padding:10px 14px;border-radius:2px;outline:none;width:100%}
+    .coupon-input:focus{border-color:#c8922a}
+    .coupon-input::placeholder{color:#475569}
+
+    /* Row enter anim */
+    @keyframes rowIn{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:translateX(0)}}
+    .cart-row{animation:rowIn .4s ease both}
+
+    /* Scroll top */
+    #scroll-top{position:fixed;bottom:24px;right:24px;width:44px;height:44px;background:#c8922a;color:#020b18;border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transform:translateY(1rem);transition:all .3s ease;z-index:40}
+    #scroll-top.show{opacity:1;transform:translateY(0)}
+  </style>
+</head>
+<body class="map-grid">
+
+<!-- ════ NAVBAR ════ -->
+<header id="navbar" class="fixed top-0 left-0 right-0 z-50 glass-nav">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16 lg:h-20">
+      <a href="index.html" class="flex items-center gap-3 group">
+        <div class="w-10 h-10 lg:w-12 lg:h-12 rounded-full border-2 border-gold-500 flex items-center justify-center bg-navy-800 group-hover:border-gold-300 transition-colors">
+          <i class="fa-solid fa-anchor text-gold-500 text-lg group-hover:text-gold-300 transition-colors"></i>
+        </div>
+        <div>
+          <div class="font-display font-bold text-white text-base lg:text-lg leading-tight">Shellback Marines</div>
+          <div class="coord-text hidden sm:block">HYDROGRAPHIC PRODUCTS & NAUTICAL CHARTS</div>
+        </div>
+      </a>
+      <nav class="hidden lg:flex items-center gap-8">
+        <a href="index.html" class="nav-link text-slate-300 hover:text-gold-300 font-body text-sm font-medium transition-colors">Home</a>
+        <a href="about.html" class="nav-link text-slate-300 hover:text-gold-300 font-body text-sm font-medium transition-colors">About Us</a>
+        <a href="products.html" class="nav-link text-slate-300 hover:text-gold-300 font-body text-sm font-medium transition-colors">Products</a>
+        <a href="shop.html" class="nav-link text-slate-300 hover:text-gold-300 font-body text-sm font-medium transition-colors">Shop</a>
+        <a href="index.html#contact" class="nav-link text-slate-300 hover:text-gold-300 font-body text-sm font-medium transition-colors">Contact</a>
+      </nav>
+      <div class="flex items-center gap-3">
+        <a href="cart.html" class="relative text-gold-400 p-2">
+          <i class="fa-solid fa-bag-shopping text-xl"></i>
+          <span id="nav-cart-count" class="absolute -top-1 -right-1 w-5 h-5 bg-gold-500 text-navy-950 text-xs font-bold rounded-full items-center justify-center leading-none hidden">0</span>
+        </a>
+        <button id="menu-btn" class="lg:hidden text-gold-400 text-2xl p-2">
+          <i id="menu-icon" class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div id="mobile-menu" class="lg:hidden bg-navy-900 border-t border-gold-500/20">
+    <div class="px-4 py-4 flex flex-col gap-1">
+      <a href="index.html" class="text-slate-300 hover:text-gold-300 py-2.5 border-b border-white/5 font-body">Home</a>
+      <a href="about.html" class="text-slate-300 hover:text-gold-300 py-2.5 border-b border-white/5 font-body">About Us</a>
+      <a href="products.html" class="text-slate-300 hover:text-gold-300 py-2.5 border-b border-white/5 font-body">Products</a>
+      <a href="shop.html" class="text-slate-300 hover:text-gold-300 py-2.5 border-b border-white/5 font-body">Shop</a>
+      <a href="cart.html" class="text-gold-300 py-2.5 border-b border-white/5 font-body">Cart</a>
+      <a href="index.html#contact" class="text-slate-300 hover:text-gold-300 py-2.5 font-body">Contact</a>
+    </div>
+  </div>
+</header>
+
+<!-- ════ MAIN ════ -->
+<main class="pt-28 lg:pt-36 pb-20 min-h-screen">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <!-- Breadcrumb + Title -->
+    <div class="mb-10 fade-up">
+      <nav class="flex items-center gap-2 text-xs font-condensed uppercase tracking-wider text-slate-500 mb-4">
+        <a href="index.html" class="hover:text-gold-400 transition-colors">Home</a>
+        <i class="fa-solid fa-chevron-right text-gold-500/40 text-[10px]"></i>
+        <a href="shop.html" class="hover:text-gold-400 transition-colors">Shop</a>
+        <i class="fa-solid fa-chevron-right text-gold-500/40 text-[10px]"></i>
+        <span class="text-gold-400">Cart</span>
+      </nav>
+      <div class="flex items-center gap-4">
+        <h1 class="font-display font-black text-white text-3xl lg:text-5xl">Your <span class="text-gold-400">Cart</span></h1>
+        <span id="item-count-badge" class="bg-gold-500/15 border border-gold-500/30 text-gold-300 font-condensed font-bold text-xs uppercase tracking-wider px-3 py-1 rounded-sm hidden"></span>
+      </div>
+    </div>
+
+    <!-- Progress steps -->
+    <div class="flex items-center gap-0 mb-12 fade-up delay-1 max-w-md">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-full bg-gold-500 flex items-center justify-center flex-shrink-0">
+          <i class="fa-solid fa-bag-shopping text-navy-950 text-xs"></i>
+        </div>
+        <span class="font-condensed font-bold text-gold-300 text-xs uppercase tracking-wider">Cart</span>
+      </div>
+      <div class="flex-1 h-px bg-gold-500/20 mx-3"></div>
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-full border border-gold-500/30 bg-navy-800 flex items-center justify-center flex-shrink-0">
+          <i class="fa-solid fa-file-lines text-slate-500 text-xs"></i>
+        </div>
+        <span class="font-condensed text-slate-500 text-xs uppercase tracking-wider">Details</span>
+      </div>
+      <div class="flex-1 h-px bg-gold-500/10 mx-3"></div>
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-full border border-gold-500/20 bg-navy-800 flex items-center justify-center flex-shrink-0">
+          <i class="fa-solid fa-lock text-slate-600 text-xs"></i>
+        </div>
+        <span class="font-condensed text-slate-600 text-xs uppercase tracking-wider">Payment</span>
+      </div>
+    </div>
+
+    <!-- ── Two-col layout ── -->
+    <div id="cart-has-items" class="hidden">
+      <div class="flex flex-col lg:flex-row gap-8 items-start">
+
+        <!-- Left: Items -->
+        <div class="flex-1 min-w-0 space-y-3" id="cart-items-list"></div>
+
+        <!-- Right: Summary -->
+        <div class="lg:w-80 flex-shrink-0 w-full">
+          <div class="summary-card p-6 sticky top-28 space-y-5">
+
+            <h2 class="font-condensed font-bold text-white uppercase tracking-wider text-sm flex items-center gap-2">
+              <i class="fa-solid fa-receipt text-gold-400 text-xs"></i> Order Summary
+            </h2>
+            <div class="gold-divider"></div>
+
+            <!-- Line items summary -->
+            <div id="summary-lines" class="space-y-2.5 max-h-52 overflow-y-auto pr-1"></div>
+
+            <div class="gold-divider"></div>
+
+            <!-- Coupon -->
+            <div>
+              <p class="font-condensed text-slate-400 text-xs uppercase tracking-wider mb-2">Coupon Code</p>
+              <div class="flex gap-2">
+                <input id="coupon-input" type="text" placeholder="Enter code…" class="coupon-input flex-1" />
+                <button id="coupon-btn" class="bg-navy-700 hover:bg-navy-600 border border-gold-500/25 hover:border-gold-500/50 text-gold-300 font-condensed font-bold text-xs uppercase tracking-wider px-4 py-2 rounded-sm transition-all whitespace-nowrap">Apply</button>
+              </div>
+              <p id="coupon-msg" class="text-xs mt-1.5 hidden"></p>
+            </div>
+
+            <div class="gold-divider"></div>
+
+            <!-- Totals -->
+            <div class="space-y-3">
+              <div class="flex justify-between text-sm">
+                <span class="text-slate-400">Subtotal</span>
+                <span id="subtotal" class="text-white font-condensed font-bold">₹0</span>
+              </div>
+              <div id="discount-row" class="flex justify-between text-sm hidden">
+                <span class="text-emerald-400">Discount</span>
+                <span id="discount-val" class="text-emerald-400 font-condensed font-bold">-₹0</span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span class="text-slate-400">Shipping</span>
+                <span class="text-slate-300 font-condensed">Calculated at checkout</span>
+              </div>
+              <div class="gold-divider"></div>
+              <div class="flex justify-between items-baseline">
+                <span class="font-condensed font-bold text-white uppercase tracking-wider text-sm">Total</span>
+                <span id="grand-total" class="font-display font-bold text-gold-300 text-2xl">₹0</span>
+              </div>
+            </div>
+
+            <!-- CTA -->
+            <button class="btn-primary" onclick="if(coupon){localStorage.setItem('sm_coupon',JSON.stringify({code:coupon,pct:VALID_COUPONS[coupon]}));}else{localStorage.removeItem('sm_coupon');} window.location.href='checkout.html';">
+              <i class="fa-solid fa-lock text-sm"></i>
+              Proceed to Checkout
+            </button>
+            <a href="shop.html" class="btn-secondary">
+              <i class="fa-solid fa-arrow-left text-xs"></i>
+              Continue Shopping
+            </a>
+
+            <!-- Trust badges -->
+            <div class="flex items-center justify-center gap-4 pt-2 border-t border-gold-500/10">
+              <div class="flex flex-col items-center gap-1 text-slate-500">
+                <i class="fa-solid fa-shield-halved text-gold-500/50 text-base"></i>
+                <span class="text-[10px] font-condensed uppercase tracking-wider">Secure</span>
+              </div>
+              <div class="flex flex-col items-center gap-1 text-slate-500">
+                <i class="fa-solid fa-truck-fast text-gold-500/50 text-base"></i>
+                <span class="text-[10px] font-condensed uppercase tracking-wider">Fast Ship</span>
+              </div>
+              <div class="flex flex-col items-center gap-1 text-slate-500">
+                <i class="fa-solid fa-certificate text-gold-500/50 text-base"></i>
+                <span class="text-[10px] font-condensed uppercase tracking-wider">Official</span>
+              </div>
+              <div class="flex flex-col items-center gap-1 text-slate-500">
+                <i class="fa-solid fa-headset text-gold-500/50 text-base"></i>
+                <span class="text-[10px] font-condensed uppercase tracking-wider">Support</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Clear cart -->
+      <div class="mt-6 flex justify-start">
+        <button id="clear-cart-btn" class="flex items-center gap-2 text-slate-500 hover:text-rose-400 font-condensed text-xs uppercase tracking-wider transition-colors">
+          <i class="fa-solid fa-trash-can text-xs"></i> Clear Entire Cart
+        </button>
+      </div>
+    </div>
+
+    <!-- ── Empty state ── -->
+    <div id="cart-empty" class="hidden">
+      <div class="empty-state flex flex-col items-center justify-center text-center py-24">
+        <div class="relative mb-8">
+          <div class="w-28 h-28 bg-navy-800/60 border border-gold-500/15 rounded-full flex items-center justify-center">
+            <i class="fa-solid fa-bag-shopping text-gold-400/30 text-4xl"></i>
+          </div>
+          <div class="absolute -bottom-1 -right-1 w-10 h-10 bg-navy-900 border border-gold-500/20 rounded-full flex items-center justify-center">
+            <i class="fa-solid fa-xmark text-slate-500 text-sm"></i>
+          </div>
+        </div>
+        <h2 class="font-display font-bold text-white text-2xl lg:text-3xl mb-3">Your cart is empty</h2>
+        <p class="text-slate-400 text-sm max-w-sm leading-relaxed mb-8">You haven't added any nautical charts or publications yet. Browse our full catalogue to find the charts you need.</p>
+        <a href="shop.html" class="inline-flex items-center gap-3 bg-gold-500 hover:bg-gold-400 text-navy-950 font-condensed font-bold uppercase tracking-wider text-sm px-8 py-4 rounded-sm transition-all hover:scale-105">
+          <i class="fa-solid fa-store text-sm"></i>
+          Browse the Shop
+        </a>
+        <a href="products.html" class="mt-4 inline-flex items-center gap-2 text-slate-400 hover:text-gold-300 font-condensed text-xs uppercase tracking-wider transition-colors">
+          <i class="fa-solid fa-arrow-left text-xs"></i> View All Products
+        </a>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- ════ FOOTER ════ -->
+<footer class="bg-navy-950 border-t border-gold-500/15">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-full border border-gold-500/50 flex items-center justify-center bg-navy-800">
+          <i class="fa-solid fa-anchor text-gold-400 text-sm"></i>
+        </div>
+        <span class="font-display font-bold text-white text-sm">Shellback Marines</span>
+      </div>
+      <p class="text-slate-500 text-xs">© 2025 Shellback Marines. All rights reserved.</p>
+      <div class="flex items-center gap-5 text-xs text-slate-500">
+        <a href="#" class="hover:text-gold-300 transition-colors">Privacy Policy</a>
+        <a href="#" class="hover:text-gold-300 transition-colors">Terms</a>
+        <a href="#" class="hover:text-gold-300 transition-colors">Shipping Policy</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-chevron-up text-sm"></i></button>
+<div id="toast"></div>
+
+<!-- ════ JS ════ -->
+<script>
+// ── Cart state via localStorage ──
+const CART_KEY = 'sm_cart';
+
+function loadCart() {
+  try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; }
+  catch(e) { return []; }
+}
+function saveCart(cart) {
+  localStorage.setItem(CART_KEY, JSON.stringify(cart));
+}
+
+let cart = loadCart();
+
+// Folio tag class helper
+const tagClass = {
+  folio1:'tag-folio1', folio2:'tag-folio2', folio3:'tag-folio3',
+  folio4:'tag-folio4', folio5:'tag-folio5', folio6:'tag-folio6',
+  publications:'tag-publications', other:'tag-other'
+};
+const folioShort = {
+  folio1:'Folio 1', folio2:'Folio 2', folio3:'Folio 3',
+  folio4:'Folio 4', folio5:'Folio 5', folio6:'Folio 6',
+  publications:'Publication', other:'Paper Chart'
+};
+
+// Coupon state
+let coupon = null;
+const VALID_COUPONS = { 'MARINE10': 10, 'NHO15': 15, 'NAVY20': 20 };
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtPrice(n){ return '₹'+Number(n).toLocaleString('en-IN'); }
+
+function render() {
+  cart = loadCart();
+  const hasItems = cart.length > 0;
+
+  document.getElementById('cart-has-items').classList.toggle('hidden', !hasItems);
+  document.getElementById('cart-empty').classList.toggle('hidden', hasItems);
+
+  // Nav count
+  const totalQty = cart.reduce((s,c)=>s+c.qty,0);
+  const navCount = document.getElementById('nav-cart-count');
+  navCount.textContent = totalQty;
+  navCount.classList.toggle('hidden', totalQty === 0);
+  navCount.classList.toggle('flex', totalQty > 0);
+
+  // Badge
+  const badge = document.getElementById('item-count-badge');
+  badge.textContent = totalQty + ' item' + (totalQty!==1?'s':'');
+  badge.classList.toggle('hidden', !hasItems);
+
+  if (!hasItems) return;
+
+  // Render rows
+  const list = document.getElementById('cart-items-list');
+  list.innerHTML = cart.map((item, idx) => `
+    <div class="cart-row p-4 flex flex-col sm:flex-row sm:items-center gap-4" style="animation-delay:${idx*0.06}s">
+      <!-- Icon / image -->
+      <div class="w-16 h-16 bg-navy-800 border border-gold-500/15 rounded flex items-center justify-center flex-shrink-0">
+        <i class="fa-solid fa-map text-gold-400/50 text-2xl"></i>
+      </div>
+      <!-- Info -->
+      <div class="flex-1 min-w-0">
+        <div class="flex flex-wrap items-center gap-2 mb-1">
+          <span class="folio-tag ${tagClass[item.folio]||'tag-other'}">${folioShort[item.folio]||''}</span>
+          ${item.chart_no ? `<span class="text-slate-500 font-condensed text-xs">Chart No. ${esc(item.chart_no)}</span>` : ''}
+        </div>
+        <h3 class="font-condensed font-bold text-white text-sm leading-snug">${esc(item.name)}</h3>
+        ${item.edition ? `<p class="text-slate-500 text-xs mt-0.5">Edition ${esc(item.edition)}${item.scale?' · Scale '+esc(item.scale):''}</p>` : ''}
+        <p class="text-gold-400/60 font-condensed text-xs mt-1">${fmtPrice(item.price)} each</p>
+      </div>
+      <!-- Qty -->
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <button class="qty-btn" onclick="changeQty(${item.id}, -1)"><i class="fa-solid fa-minus text-xs"></i></button>
+        <input type="number" class="qty-input" value="${item.qty}" min="1" max="99" onchange="setQty(${item.id}, this.value)" />
+        <button class="qty-btn" onclick="changeQty(${item.id}, 1)"><i class="fa-solid fa-plus text-xs"></i></button>
+      </div>
+      <!-- Line total -->
+      <div class="text-right flex-shrink-0 min-w-[90px]">
+        <p class="font-display font-bold text-gold-300 text-lg">${fmtPrice(item.price * item.qty)}</p>
+        <button class="remove-btn mt-1 ml-auto" onclick="removeItem(${item.id})" title="Remove">
+          <i class="fa-solid fa-xmark text-xs"></i>
+        </button>
+      </div>
+    </div>
+  `).join('');
+
+  // Summary lines
+  const summaryLines = document.getElementById('summary-lines');
+  summaryLines.innerHTML = cart.map(item => `
+    <div class="flex justify-between items-start gap-2 text-xs">
+      <span class="text-slate-400 leading-tight flex-1 min-w-0 truncate">${esc(item.name)} <span class="text-slate-600">×${item.qty}</span></span>
+      <span class="text-white font-condensed font-bold flex-shrink-0">${fmtPrice(item.price * item.qty)}</span>
+    </div>
+  `).join('');
+
+  // Totals
+  const subtotal = cart.reduce((s,c)=>s+c.price*c.qty, 0);
+  let discount = 0;
+  if (coupon) {
+    discount = Math.round(subtotal * VALID_COUPONS[coupon] / 100);
+  }
+  const grand = subtotal - discount;
+
+  document.getElementById('subtotal').textContent = fmtPrice(subtotal);
+  const discRow = document.getElementById('discount-row');
+  if (discount > 0) {
+    discRow.classList.remove('hidden');
+    document.getElementById('discount-val').textContent = '-' + fmtPrice(discount) + ' ('+VALID_COUPONS[coupon]+'%)';
+  } else {
+    discRow.classList.add('hidden');
+  }
+  document.getElementById('grand-total').textContent = fmtPrice(grand);
+}
+
+function changeQty(id, delta) {
+  cart = cart.map(c => c.id===id ? {...c, qty: Math.max(1, c.qty + delta)} : c);
+  saveCart(cart);
+  render();
+}
+function setQty(id, val) {
+  const q = Math.max(1, Math.min(99, parseInt(val)||1));
+  cart = cart.map(c => c.id===id ? {...c, qty: q} : c);
+  saveCart(cart);
+  render();
+}
+function removeItem(id) {
+  cart = cart.filter(c => c.id !== id);
+  saveCart(cart);
+  render();
+  showToast('Item removed from cart');
+}
+
+// Coupon
+document.getElementById('coupon-btn').addEventListener('click', () => {
+  const code = document.getElementById('coupon-input').value.trim().toUpperCase();
+  const msg = document.getElementById('coupon-msg');
+  if (!code) return;
+  if (VALID_COUPONS[code]) {
+    coupon = code;
+    localStorage.setItem('sm_coupon', JSON.stringify({code: coupon, pct: VALID_COUPONS[coupon]}));
+    msg.textContent = '✓ Coupon applied! ' + VALID_COUPONS[code] + '% off';
+    msg.className = 'text-xs mt-1.5 text-emerald-400';
+    msg.classList.remove('hidden');
+    render();
+    showToast('Coupon applied — ' + VALID_COUPONS[code] + '% discount!');
+  } else {
+    coupon = null;
+    localStorage.removeItem('sm_coupon');
+    msg.textContent = '✗ Invalid or expired coupon code';
+    msg.className = 'text-xs mt-1.5 text-rose-400';
+    msg.classList.remove('hidden');
+    render();
+  }
+});
+document.getElementById('coupon-input').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('coupon-btn').click(); });
+
+// Clear cart
+document.getElementById('clear-cart-btn').addEventListener('click', () => {
+  if (!cart.length) return;
+  if (confirm('Remove all items from your cart?')) {
+    cart = [];
+    saveCart(cart);
+    coupon = null;
+    render();
+    showToast('Cart cleared');
+  }
+});
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// Mobile menu
+const menuBtn=document.getElementById('menu-btn'), mob=document.getElementById('mobile-menu'), icon=document.getElementById('menu-icon');
+menuBtn.addEventListener('click',()=>{ mob.classList.toggle('open'); icon.className=mob.classList.contains('open')?'fa-solid fa-xmark':'fa-solid fa-bars'; });
+
+// Scroll top
+window.addEventListener('scroll',()=>{ document.getElementById('scroll-top').classList.toggle('show', window.scrollY>300); });
+
+// Coupon saved immediately on apply (see coupon-btn handler)
+
+render();
+</script>
+</body>
+</html>

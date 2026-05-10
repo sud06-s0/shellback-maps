@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shop – Shellback Marines</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: { 950:'#020b18', 900:'#041424', 800:'#072238', 700:'#0c3454', 600:'#114a76', 500:'#155f98' },
+            ocean: { 500:'#0e7490', 400:'#0891b2', 300:'#22d3ee', 200:'#a5f3fc' },
+            gold: { 500:'#c8922a', 400:'#d4a843', 300:'#e8c76a', 200:'#fde68a' },
+          },
+          fontFamily: {
+            display: ['Playfair Display','serif'],
+            body: ['Barlow','sans-serif'],
+            condensed: ['Barlow Condensed','sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{font-family:'Barlow',sans-serif;background:#020b18;color:#e2e8f0;overflow-x:hidden}
+    ::-webkit-scrollbar{width:6px}
+    ::-webkit-scrollbar-track{background:#041424}
+    ::-webkit-scrollbar-thumb{background:#c8922a;border-radius:3px}
+
+    .map-grid{background-image:linear-gradient(rgba(200,146,42,.07)1px,transparent 1px),linear-gradient(90deg,rgba(200,146,42,.07)1px,transparent 1px);background-size:60px 60px}
+    .page-hero{background-image:linear-gradient(to bottom,rgba(2,11,24,.5)0%,rgba(2,11,24,.75)60%,rgba(2,11,24,1)100%),url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1800&q=80');background-size:cover;background-position:center}
+    .glass-nav{backdrop-filter:blur(16px) saturate(160%);-webkit-backdrop-filter:blur(16px) saturate(160%);background:rgba(2,11,24,.78);border-bottom:1px solid rgba(200,146,42,.18)}
+    .gold-divider{height:2px;background:linear-gradient(90deg,transparent,#c8922a,transparent)}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes spin-slow{to{transform:rotate(360deg)}}
+    .compass-spin{animation:spin-slow 30s linear infinite}
+    .fade-up{animation:fadeUp .9s ease both}
+    .delay-1{animation-delay:.15s}.delay-2{animation-delay:.35s}
+    .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+    .reveal.visible{opacity:1;transform:translateY(0)}
+    .nav-link{position:relative}
+    .nav-link::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1px;background:#c8922a;transition:width .3s ease}
+    .nav-link:hover::after,.nav-link.active-page::after{width:100%}
+    .coord-text{font-family:'Barlow Condensed',sans-serif;letter-spacing:.15em;color:rgba(200,146,42,.5);font-size:.65rem}
+    #mobile-menu{transition:max-height .4s ease,opacity .4s ease;max-height:0;opacity:0;overflow:hidden}
+    #mobile-menu.open{max-height:500px;opacity:1}
+
+    /* Sidebar filter */
+    .filter-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:2px;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .25s ease;border:1px solid rgba(200,146,42,.2);color:#94a3b8;background:rgba(7,34,56,.5)}
+    .filter-chip:hover{border-color:rgba(200,146,42,.5);color:#d4a843}
+    .filter-chip.active{background:#c8922a;border-color:#c8922a;color:#020b18}
+    .filter-chip .count{font-size:.7rem;opacity:.7}
+
+    /* Product card */
+    .product-card{background:rgba(7,34,56,.55);border:1px solid rgba(200,146,42,.1);border-radius:3px;transition:all .3s ease;display:flex;flex-direction:column}
+    .product-card:hover{border-color:rgba(200,146,42,.45);background:rgba(12,52,84,.7);transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,.5),0 0 0 1px rgba(200,146,42,.2)}
+    .product-card .img-wrap{overflow:hidden;flex-shrink:0}
+    .product-card .img-wrap img{transition:transform .5s ease;width:100%;height:100%;object-fit:cover}
+    .product-card:hover .img-wrap img{transform:scale(1.07)}
+    .card-body{padding:14px;display:flex;flex-direction:column;flex:1}
+
+    /* Sort / per-page select */
+    .sm-select{background:rgba(7,34,56,.8);border:1px solid rgba(200,146,42,.2);color:#cbd5e1;font-family:'Barlow Condensed',sans-serif;font-size:.8rem;padding:7px 10px;border-radius:2px;outline:none;cursor:pointer}
+    .sm-select:focus{border-color:#c8922a}
+
+    /* Search */
+    .search-box{background:rgba(7,34,56,.8);border:1px solid rgba(200,146,42,.2);color:#e2e8f0;font-family:'Barlow',sans-serif;font-size:.85rem;padding:8px 14px 8px 36px;border-radius:2px;outline:none;width:100%}
+    .search-box::placeholder{color:#64748b}
+    .search-box:focus{border-color:#c8922a}
+
+    /* Add to cart btn */
+    .btn-cart{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;padding:7px 12px;background:#c8922a;color:#020b18;border:none;border-radius:2px;cursor:pointer;transition:background .2s ease,transform .15s ease;white-space:nowrap}
+    .btn-cart:hover{background:#d4a843;transform:scale(1.03)}
+    .btn-cart:active{transform:scale(.97)}
+    .btn-cart.added{background:#155f98;color:#fff}
+
+    /* Cart drawer */
+    #cart-drawer{position:fixed;right:-420px;top:0;height:100%;width:380px;max-width:100vw;background:#041424;border-left:1px solid rgba(200,146,42,.2);z-index:200;transition:right .35s ease;display:flex;flex-direction:column}
+    #cart-drawer.open{right:0}
+    #cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:199;opacity:0;pointer-events:none;transition:opacity .3s ease}
+    #cart-overlay.open{opacity:1;pointer-events:all}
+
+    /* Pagination */
+    .page-btn{min-width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:2px;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:.8rem;cursor:pointer;transition:all .2s ease;border:1px solid rgba(200,146,42,.15);color:#94a3b8;background:rgba(7,34,56,.5)}
+    .page-btn:hover{border-color:rgba(200,146,42,.4);color:#d4a843}
+    .page-btn.active{background:#c8922a;border-color:#c8922a;color:#020b18}
+    .page-btn.disabled{opacity:.35;cursor:default;pointer-events:none}
+
+    /* Tag badge */
+    .folio-tag{font-family:'Barlow Condensed',sans-serif;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:2px;white-space:nowrap}
+
+    /* Toast */
+    #toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:#c8922a;color:#020b18;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;padding:10px 22px;border-radius:2px;opacity:0;transition:all .3s ease;z-index:300;pointer-events:none;white-space:nowrap}
+    #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+    /* Grid / List toggle */
+    .view-active{color:#c8922a!important}
+  </style>
+</head>
+<body>
+
+<!-- ════ NAVBAR ════ -->
+<header id="navbar" class="fixed top-0 left-0 right-0 z-50 glass-nav transition-all duration-300">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16 lg:h-20">
+      <a href="index.html" class="flex items-center gap-3 group">
+        <div class="w-10 h-10 lg:w-12 lg:h-12 rounded-full border-2 border-gold-500 flex items-center justify-center bg-navy-800 group-hover:border-gold-300 transition-colors">
+          <i class="fa-solid fa-anchor text-gold-500 text-lg lg:text-xl group-hover:text-gold-300 transition-colors"></i>
+        </div>
+        <div>
+          <div class="font-display font-bold text-white text-base lg:text-lg leading-tight">Shellback Marines</div>
+          <div class="coord-text hidden sm:block">HYDROGRAPHIC PRODUCTS & NAUTICAL CHARTS</div>
+        </div>
+      </a>
+      <nav class="hidden lg:flex items-center gap-8">
+        <a href="index.html" class="nav-link text-slate-300 hover:text-gold-300 font-body text-sm font-medium transition-colors">Home</a>
+        <a href="about.html" class="nav-link text-slate-300 hover:text-gold-300 font-body text-sm font-medium transition-colors">About Us</a>
+        <a href="products.html" class="nav-link text-slate-300 hover:text-gold-300 font-body text-sm font-medium transition-colors">Products</a>
+        <a href="shop.html" class="nav-link active-page text-gold-300 font-body text-sm font-medium transition-colors">Shop</a>
+        <a href="index.html#contact" class="nav-link text-slate-300 hover:text-gold-300 font-body text-sm font-medium transition-colors">Contact</a>
+      </nav>
+      <div class="flex items-center gap-4">
+        <!-- Cart icon -->
+        <a href="cart.html" id="cart-btn" class="relative text-slate-300 hover:text-gold-300 transition-colors p-2" aria-label="Cart">
+          <i class="fa-solid fa-bag-shopping text-xl"></i>
+          <span id="cart-count" class="absolute -top-1 -right-1 w-5 h-5 bg-gold-500 text-navy-950 text-xs font-bold rounded-full flex items-center justify-center leading-none hidden">0</span>
+        </a>
+        <button id="menu-btn" class="lg:hidden text-gold-400 text-2xl p-2" aria-label="Toggle menu">
+          <i id="menu-icon" class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div id="mobile-menu" class="lg:hidden bg-navy-900 border-t border-gold-500/20">
+    <div class="px-4 py-4 flex flex-col gap-1">
+      <a href="index.html" class="text-slate-300 hover:text-gold-300 py-2.5 border-b border-white/5 font-body">Home</a>
+      <a href="about.html" class="text-slate-300 hover:text-gold-300 py-2.5 border-b border-white/5 font-body">About Us</a>
+      <a href="products.html" class="text-slate-300 hover:text-gold-300 py-2.5 border-b border-white/5 font-body">Products</a>
+      <a href="shop.html" class="text-gold-300 py-2.5 border-b border-white/5 font-body">Shop</a>
+      <a href="index.html#contact" class="text-slate-300 hover:text-gold-300 py-2.5 border-b border-white/5 font-body">Contact</a>
+    </div>
+  </div>
+</header>
+
+<!-- ════ HERO ════ -->
+<section class="relative page-hero map-grid pt-32 pb-16 lg:pt-44 lg:pb-24 flex items-center">
+  <div class="absolute top-20 right-8 opacity-10 compass-spin" aria-hidden="true">
+    <i class="fa-solid fa-compass text-gold-400 text-8xl lg:text-9xl"></i>
+  </div>
+  <div class="absolute bottom-10 left-6 coord-text">N 22°34.8′ / E 88°21.6′ — JALPAIGURI, WB</div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+    <nav class="flex items-center gap-2 text-xs font-condensed uppercase tracking-wider text-slate-500 mb-6 fade-up">
+      <a href="index.html" class="hover:text-gold-400 transition-colors">Home</a>
+      <i class="fa-solid fa-chevron-right text-gold-500/40 text-[10px]"></i>
+      <span class="text-gold-400">Shop</span>
+    </nav>
+    <div class="max-w-2xl">
+      <div class="flex items-center gap-3 mb-5 fade-up">
+        <div class="h-px w-10 bg-gold-500"></div>
+        <span class="coord-text text-gold-400 tracking-widest text-xs uppercase font-condensed">317 Products Available</span>
+      </div>
+      <h1 class="font-display font-black text-white text-4xl lg:text-6xl leading-tight mb-5 fade-up delay-1">
+        The Chart <span class="text-gold-400">Shop</span>
+      </h1>
+      <p class="text-slate-300 text-lg leading-relaxed fade-up delay-2">
+        Official nautical charts and publications from India's National Hydrographic Office — browse by folio, search by name or chart number, and add to cart.
+      </p>
+    </div>
+  </div>
+  <div class="absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-t from-navy-950 to-transparent pointer-events-none"></div>
+</section>
+
+<!-- ════ SHOP BODY ════ -->
+<section class="bg-navy-950 py-12 lg:py-16">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col lg:flex-row gap-8">
+
+      <!-- ── SIDEBAR ── -->
+      <aside class="lg:w-64 flex-shrink-0">
+        <div class="sticky top-24 space-y-6">
+
+          <!-- Search -->
+          <div>
+            <h3 class="font-condensed font-bold text-white uppercase tracking-wider text-xs mb-3 flex items-center gap-2">
+              <i class="fa-solid fa-magnifying-glass text-gold-400 text-xs"></i> Search
+            </h3>
+            <div class="relative">
+              <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gold-500/50 text-xs pointer-events-none"></i>
+              <input id="search-input" type="text" placeholder="Chart name or number…" class="search-box" autocomplete="off" />
+            </div>
+          </div>
+
+          <div class="gold-divider"></div>
+
+          <!-- Category filters -->
+          <div>
+            <h3 class="font-condensed font-bold text-white uppercase tracking-wider text-xs mb-3 flex items-center gap-2">
+              <i class="fa-solid fa-filter text-gold-400 text-xs"></i> Categories
+            </h3>
+            <div class="flex flex-col gap-2" id="filter-list">
+              <button class="filter-chip active" data-folio="all">
+                <i class="fa-solid fa-layer-group text-xs"></i>
+                <span>All Products</span>
+                <span class="count ml-auto">(317)</span>
+              </button>
+              <button class="filter-chip" data-folio="folio1">
+                <i class="fa-solid fa-map text-xs"></i>
+                <span>Folio 1 — Indian Ocean</span>
+                <span class="count ml-auto" id="cnt-folio1"></span>
+              </button>
+              <button class="filter-chip" data-folio="folio2">
+                <i class="fa-solid fa-map text-xs"></i>
+                <span>Folio 2 — Gujarat</span>
+                <span class="count ml-auto" id="cnt-folio2"></span>
+              </button>
+              <button class="filter-chip" data-folio="folio3">
+                <i class="fa-solid fa-map text-xs"></i>
+                <span>Folio 3 — West Coast</span>
+                <span class="count ml-auto" id="cnt-folio3"></span>
+              </button>
+              <button class="filter-chip" data-folio="folio4">
+                <i class="fa-solid fa-map text-xs"></i>
+                <span>Folio 4 — Kerala</span>
+                <span class="count ml-auto" id="cnt-folio4"></span>
+              </button>
+              <button class="filter-chip" data-folio="folio5">
+                <i class="fa-solid fa-map text-xs"></i>
+                <span>Folio 5 — East Coast</span>
+                <span class="count ml-auto" id="cnt-folio5"></span>
+              </button>
+              <button class="filter-chip" data-folio="folio6">
+                <i class="fa-solid fa-map text-xs"></i>
+                <span>Folio 6 — Andaman</span>
+                <span class="count ml-auto" id="cnt-folio6"></span>
+              </button>
+              <button class="filter-chip" data-folio="publications">
+                <i class="fa-solid fa-book-open text-xs"></i>
+                <span>Publications</span>
+                <span class="count ml-auto" id="cnt-publications"></span>
+              </button>
+              <button class="filter-chip" data-folio="other">
+                <i class="fa-solid fa-layer-group text-xs"></i>
+                <span>Paper Charts</span>
+                <span class="count ml-auto" id="cnt-other"></span>
+              </button>
+            </div>
+          </div>
+
+          <div class="gold-divider"></div>
+
+          <!-- Price info -->
+          <div class="bg-navy-800/50 border border-gold-500/15 rounded p-4">
+            <h3 class="font-condensed font-bold text-white uppercase tracking-wider text-xs mb-3 flex items-center gap-2">
+              <i class="fa-solid fa-tag text-gold-400 text-xs"></i> Pricing
+            </h3>
+            <div class="space-y-2 text-sm">
+              <div class="flex justify-between text-slate-400">
+                <span>Paper Charts</span>
+                <span class="text-gold-300 font-condensed font-bold">₹2,000</span>
+              </div>
+              <div class="flex justify-between text-slate-400">
+                <span>Pilot Books</span>
+                <span class="text-gold-300 font-condensed font-bold">₹4,800</span>
+              </div>
+              <div class="flex justify-between text-slate-400">
+                <span>List of Lights</span>
+                <span class="text-gold-300 font-condensed font-bold">₹2,500</span>
+              </div>
+              <div class="flex justify-between text-slate-400">
+                <span>Radio Signals</span>
+                <span class="text-gold-300 font-condensed font-bold">₹3,800</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contact CTA -->
+          <div class="bg-gold-500/10 border border-gold-500/25 rounded p-4">
+            <p class="text-slate-300 text-xs leading-relaxed mb-3">Need help finding the right chart for your voyage?</p>
+            <a href="mailto:abhisek@shellbackmarines.com" class="flex items-center gap-2 text-gold-300 hover:text-gold-200 font-condensed font-bold uppercase text-xs tracking-wider transition-colors">
+              <i class="fa-solid fa-envelope text-gold-400"></i> Get in Touch
+            </a>
+          </div>
+
+        </div>
+      </aside>
+
+      <!-- ── PRODUCT GRID ── -->
+      <div class="flex-1 min-w-0">
+
+        <!-- Toolbar -->
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-6 pb-5 border-b border-gold-500/15">
+          <div class="flex items-center gap-2">
+            <span id="results-count" class="font-condensed text-slate-400 text-sm"></span>
+            <span id="active-filter-label" class="folio-tag bg-gold-500/15 text-gold-300 border border-gold-500/25"></span>
+          </div>
+          <div class="flex items-center gap-3">
+            <!-- Sort -->
+            <select id="sort-select" class="sm-select">
+              <option value="default">Default Sorting</option>
+              <option value="az">Name: A → Z</option>
+              <option value="za">Name: Z → A</option>
+              <option value="price-asc">Price: Low → High</option>
+              <option value="price-desc">Price: High → Low</option>
+              <option value="chart-asc">Chart No. ↑</option>
+            </select>
+            <!-- Per page -->
+            <select id="per-page-select" class="sm-select">
+              <option value="12">12 / page</option>
+              <option value="24" selected>24 / page</option>
+              <option value="48">48 / page</option>
+              <option value="9999">Show All</option>
+            </select>
+            <!-- View toggle -->
+            <div class="hidden sm:flex items-center gap-1">
+              <button id="view-grid" class="view-active text-gold-400 p-1.5 transition-colors" title="Grid view"><i class="fa-solid fa-grid-2 text-sm"></i></button>
+              <button id="view-list" class="text-slate-500 hover:text-slate-300 p-1.5 transition-colors" title="List view"><i class="fa-solid fa-list text-sm"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Products container -->
+        <div id="products-container" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5"></div>
+
+        <!-- No results -->
+        <div id="no-results" class="hidden text-center py-20">
+          <div class="w-16 h-16 bg-navy-800 border border-gold-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fa-solid fa-magnifying-glass text-gold-400 text-xl"></i>
+          </div>
+          <h3 class="font-display font-bold text-white text-xl mb-2">No charts found</h3>
+          <p class="text-slate-400 text-sm">Try adjusting your search or filter criteria.</p>
+        </div>
+
+        <!-- Pagination -->
+        <div id="pagination" class="flex flex-wrap items-center justify-center gap-2 mt-10"></div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ FOOTER ════ -->
+<footer class="bg-navy-950 border-t border-gold-500/15">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-10">
+      <div class="lg:col-span-1">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-10 h-10 rounded-full border-2 border-gold-500 flex items-center justify-center bg-navy-800">
+            <i class="fa-solid fa-anchor text-gold-400 text-lg"></i>
+          </div>
+          <div>
+            <div class="font-display font-bold text-white text-base">Shellback Marines</div>
+            <div class="coord-text">SINCE 2023</div>
+          </div>
+        </div>
+        <p class="text-slate-400 text-sm leading-relaxed mb-5">Premier source for hydrographic products and nautical charts. Serving mariners, naval forces, and maritime professionals across India.</p>
+        <div class="flex gap-3">
+          <a href="#" class="w-9 h-9 bg-navy-800 border border-gold-500/20 hover:border-gold-400 rounded flex items-center justify-center text-slate-400 hover:text-gold-300 transition-all"><i class="fa-brands fa-facebook-f text-sm"></i></a>
+          <a href="#" class="w-9 h-9 bg-navy-800 border border-gold-500/20 hover:border-gold-400 rounded flex items-center justify-center text-slate-400 hover:text-gold-300 transition-all"><i class="fa-brands fa-instagram text-sm"></i></a>
+          <a href="#" class="w-9 h-9 bg-navy-800 border border-gold-500/20 hover:border-gold-400 rounded flex items-center justify-center text-slate-400 hover:text-gold-300 transition-all"><i class="fa-brands fa-linkedin-in text-sm"></i></a>
+          <a href="https://wa.me/919742172874" class="w-9 h-9 bg-navy-800 border border-gold-500/20 hover:border-gold-400 rounded flex items-center justify-center text-slate-400 hover:text-gold-300 transition-all"><i class="fa-brands fa-whatsapp text-sm"></i></a>
+        </div>
+      </div>
+      <div>
+        <h4 class="font-condensed font-bold text-white uppercase tracking-wider text-sm mb-5">Quick Links</h4>
+        <ul class="space-y-2.5">
+          <li><a href="index.html" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-gold-500/50 text-xs"></i>Home</a></li>
+          <li><a href="about.html" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-gold-500/50 text-xs"></i>About Us</a></li>
+          <li><a href="products.html" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-gold-500/50 text-xs"></i>Products</a></li>
+          <li><a href="shop.html" class="text-gold-300 text-sm flex items-center gap-2"><i class="fa-solid fa-chevron-right text-gold-500/50 text-xs"></i>Shop</a></li>
+          <li><a href="index.html#contact" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-gold-500/50 text-xs"></i>Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-condensed font-bold text-white uppercase tracking-wider text-sm mb-5">Categories</h4>
+        <ul class="space-y-2.5">
+          <li><button onclick="setFilter('folio1')" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2 text-left"><i class="fa-solid fa-map text-gold-500/50 text-xs"></i>Folio 1 — Indian Ocean</button></li>
+          <li><button onclick="setFilter('folio2')" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2 text-left"><i class="fa-solid fa-map text-gold-500/50 text-xs"></i>Folio 2 — Gujarat</button></li>
+          <li><button onclick="setFilter('folio3')" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2 text-left"><i class="fa-solid fa-map text-gold-500/50 text-xs"></i>Folio 3 — West Coast</button></li>
+          <li><button onclick="setFilter('folio4')" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2 text-left"><i class="fa-solid fa-map text-gold-500/50 text-xs"></i>Folio 4 — Kerala</button></li>
+          <li><button onclick="setFilter('folio5')" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2 text-left"><i class="fa-solid fa-map text-gold-500/50 text-xs"></i>Folio 5 — East Coast</button></li>
+          <li><button onclick="setFilter('folio6')" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2 text-left"><i class="fa-solid fa-map text-gold-500/50 text-xs"></i>Folio 6 — Andaman</button></li>
+          <li><button onclick="setFilter('publications')" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2 text-left"><i class="fa-solid fa-book text-gold-500/50 text-xs"></i>Publications</button></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-condensed font-bold text-white uppercase tracking-wider text-sm mb-5">Contact</h4>
+        <ul class="space-y-4">
+          <li class="flex items-start gap-3"><i class="fa-solid fa-phone text-gold-400 mt-0.5 flex-shrink-0 text-sm"></i><a href="tel:+919742172874" class="text-slate-400 hover:text-gold-300 text-sm transition-colors">+91-97421 72874</a></li>
+          <li class="flex items-start gap-3"><i class="fa-solid fa-envelope text-gold-400 mt-0.5 flex-shrink-0 text-sm"></i><a href="mailto:abhisek@shellbackmarines.com" class="text-slate-400 hover:text-gold-300 text-sm transition-colors break-all">abhisek@shellbackmarines.com</a></li>
+          <li class="flex items-start gap-3"><i class="fa-solid fa-location-dot text-gold-400 mt-0.5 flex-shrink-0 text-sm"></i><address class="text-slate-400 not-italic text-sm leading-relaxed">Oodlabari Bidhanpally PO Manabari, Dist Jalpaiguri, WB 735222</address></li>
+        </ul>
+      </div>
+    </div>
+    <div class="border-t border-white/5 mt-12 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p class="text-slate-500 text-sm">© 2025 Shellback Marines. All rights reserved.</p>
+      <p class="text-slate-600 text-xs font-condensed uppercase tracking-wider">Guardians of the Nation · Warriors of the Seas</p>
+    </div>
+  </div>
+</footer>
+
+<!-- Scroll to top -->
+<button id="scroll-top" class="fixed bottom-6 right-6 w-12 h-12 bg-gold-500 hover:bg-gold-400 text-navy-950 rounded-full shadow-lg flex items-center justify-center opacity-0 translate-y-4 transition-all duration-300 z-40" aria-label="Scroll to top">
+  <i class="fa-solid fa-chevron-up"></i>
+</button>
+
+    <button id="cart-close" class="text-slate-400 hover:text-gold-300 transition-colors p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+  </div>
+  <div id="cart-items" class="flex-1 overflow-y-auto px-5 py-4 space-y-3"></div>
+  <div class="flex-shrink-0 border-t border-gold-500/20 px-5 py-4 space-y-4">
+    <div class="flex justify-between items-center">
+      <span class="font-condensed text-slate-300 uppercase tracking-wider text-sm">Total</span>
+      <span id="cart-total" class="font-display font-bold text-gold-300 text-xl">₹0</span>
+    </div>
+    <button id="checkout-btn" class="w-full bg-gold-500 hover:bg-gold-400 text-navy-950 font-condensed font-bold uppercase tracking-wider text-sm py-3 rounded-sm transition-colors">
+      <i class="fa-solid fa-lock mr-2"></i>Proceed to Checkout
+    </button>
+    <p class="text-slate-500 text-xs text-center">Shipping calculated at checkout</p>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- ════ JAVASCRIPT ════ -->
+<script>
+const ALL_PRODUCTS = [{"id":186,"name":"Colombo to Galle","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"225","edition":"1980","scale":"1:150000"},{"id":188,"name":"Galle to Little Basses","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"226","edition":"1981","scale":"1:150000"},{"id":189,"name":"Approaches to Cargados Carajos Shoals (Saint Brandon)","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"2503","edition":"2017","scale":"75000"},{"id":190,"name":"Mathurin Harbour","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"2504","edition":"2020","scale":"1:12500"},{"id":191,"name":"Approaches to Mathurin harbour","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"2505","edition":"2020","scale":"25000"},{"id":192,"name":"Grand Port","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"2507","edition":"2021","scale":"1:125000"},{"id":193,"name":"AGALEGA JETTY","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"2508","edition":"2023","scale":"1:5000"},{"id":194,"name":"Assumption Island - B","price":2000,"folio":"other","cat":"Paper Charts","chart_no":"2509","edition":"2014","scale":"7500"},{"id":195,"name":"Pungoe Wharf","price":2000,"folio":"other","cat":"Paper Charts","chart_no":"2510","edition":"2013","scale":"1:7500"},{"id":196,"name":"Approaches to Beira Port","price":2000,"folio":"other","cat":"Paper Charts","chart_no":"2511","edition":"2013","scale":"20000"},{"id":198,"name":"Coetivy Island","price":2000,"folio":"other","cat":"Paper Charts","chart_no":"2513","edition":"2013","scale":"37500"},{"id":199,"name":"Port Louis","price":2000,"folio":"other","cat":"Paper Charts","chart_no":"2514","edition":"2018","scale":"1:12500"},{"id":200,"name":"Dar Es Salaam Harbour","price":2000,"folio":"other","cat":"Paper Charts","chart_no":"2516","edition":"2014","scale":"1:7500"},{"id":202,"name":"Port of Zanzibar","price":2000,"folio":"other","cat":"Paper Charts","chart_no":"2524","edition":"2015","scale":"20000"},{"id":203,"name":"Mauritius","price":2000,"folio":"other","cat":"Paper Charts","chart_no":"2527","edition":"","scale":""},{"id":204,"name":"Mkoani Harbour","price":2000,"folio":"other","cat":"Paper Charts","chart_no":"2528","edition":"","scale":""},{"id":205,"name":"Rodrigues Island","price":2000,"folio":"other","cat":"Paper Charts","chart_no":"2531","edition":"","scale":""},{"id":206,"name":"Approaches to Port Victoria","price":2000,"folio":"other","cat":"Paper Charts","chart_no":"2551","edition":"","scale":""},{"id":207,"name":"Western Approaches to Mahe island","price":2000,"folio":"other","cat":"Paper Charts","chart_no":"2552","edition":"","scale":""},{"id":210,"name":"Inner Approaches to Port Victoria","price":2000,"folio":"other","cat":"Paper Charts","chart_no":"2556","edition":"","scale":""},{"id":211,"name":"KULHUDHUFFUSHI ANCHORAGES","price":2000,"folio":"other","cat":"Paper Charts","chart_no":"2596","edition":"","scale":""},{"id":212,"name":"Mkokoni","price":2000,"folio":"other","cat":"Paper Charts","chart_no":"2640","edition":"","scale":""},{"id":213,"name":"Kiwaiyu Bay","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"2641","edition":"","scale":""},{"id":214,"name":"Manda Bay","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"2642","edition":"","scale":""},{"id":215,"name":"Approaches to Manda Bay","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"2643","edition":"","scale":""},{"id":216,"name":"Tanga Port","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"2693","edition":"","scale":""},{"id":217,"name":"Western approaches to Pemba Island","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"2695","edition":"","scale":""},{"id":218,"name":"APPROACHES TO SITTWE HARBOUR","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"3511","edition":"","scale":""},{"id":219,"name":"Indian Ocean Southern Part","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"7070","edition":"","scale":""},{"id":220,"name":"Indian Ocean Northern Part","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"7071","edition":"","scale":""},{"id":221,"name":"Indian ocean western part","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"7072","edition":"","scale":""},{"id":222,"name":"Indian Ocean Eastern Part","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"7073","edition":"","scale":""},{"id":223,"name":"Walvis Bay to Mauritius","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"7204","edition":"","scale":""},{"id":224,"name":"South China Sea","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"7508","edition":"","scale":""},{"id":225,"name":"Port Elizabeth to Mauritius","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"7700","edition":"","scale":""},{"id":226,"name":"Maputo to Muqdisho","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"7701","edition":"","scale":""},{"id":227,"name":"Chagos Arhipelago to Madagascar","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"7702","edition":"","scale":""},{"id":228,"name":"Gulf of Aden to the Maldives and the Seychelles Group","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"7703","edition":"","scale":""},{"id":229,"name":"Red Sea","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"7704","edition":"","scale":""},{"id":230,"name":"Arabian Sea","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"7705","edition":"","scale":""},{"id":231,"name":"Bay of Bengal","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"7706","edition":"","scale":""},{"id":232,"name":"Maldives to Sumatera","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"7707","edition":"","scale":""},{"id":233,"name":"Australia West Coast","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"7708","edition":"","scale":""},{"id":234,"name":"Muscat to Mumbai","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"21","edition":"","scale":""},{"id":235,"name":"Gora Chan Creek to Godia Creek","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"201","edition":"","scale":""},{"id":236,"name":"Extension to Navlakhi","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"203","edition":"","scale":""},{"id":237,"name":"Dwarka to Navibandar","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"204","edition":"","scale":""},{"id":238,"name":"Navibandar to Veraval","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"205","edition":"","scale":""},{"id":239,"name":"Veraval to Diu Head","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"206","edition":"","scale":""},{"id":240,"name":"Gulf of Khambat","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"208","edition":"","scale":""},{"id":241,"name":"Hazira to Umargam","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"209","edition":"","scale":""},{"id":242,"name":"Sir Creek to Dwarka","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"251","edition":"","scale":""},{"id":243,"name":"VERAVAL TO PIPAVAV","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"253","edition":"","scale":""},{"id":244,"name":"Approaches to Gulf of Kachchh","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"271","edition":"","scale":""},{"id":245,"name":"Gwadar to Dwarka","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"291","edition":"","scale":""},{"id":246,"name":"Dwarka to Mumbai","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"292","edition":"","scale":""},{"id":247,"name":"Approaches to Godia Creek","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"2005","edition":"","scale":""},{"id":248,"name":"Port of Okha","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"2013","edition":"","scale":""},{"id":249,"name":"Navlakhi and Approaches","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"2017","edition":"","scale":""},{"id":250,"name":"Approaches to Kandla","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"2018","edition":"","scale":""},{"id":251,"name":"RELIANCE TANKER BERTHS","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"2025","edition":"","scale":""},{"id":252,"name":"SIKKA CHANNEL","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"2021","edition":"","scale":""},{"id":253,"name":"Rozi Anchorage","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"2027","edition":"","scale":""},{"id":254,"name":"Okha Harbour","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"2031","edition":"","scale":""},{"id":255,"name":"SIKKA CREEK","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"2033","edition":"","scale":""},{"id":256,"name":"Hazira Port","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"2034","edition":"","scale":""},{"id":257,"name":"Porbandar Port","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"2040","edition":"","scale":""},{"id":258,"name":"Salaya Harbour","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"2051","edition":"","scale":""},{"id":259,"name":"Madhwad Bay","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"2054","edition":"","scale":""},{"id":260,"name":"MulDwarka North Jetty","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"2055","edition":"","scale":""},{"id":261,"name":"Jafarabad Harbour","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"2056","edition":"","scale":""},{"id":262,"name":"Simar Anchorage","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"2057","edition":"","scale":""},{"id":263,"name":"Kandla Sogal Channel","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"2059","edition":"","scale":""},{"id":264,"name":"Pathfinder Inlet","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"2060","edition":"","scale":""},{"id":265,"name":"Gulf of Kachchh Deep Water Route","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"2068","edition":"","scale":""},{"id":266,"name":"Approaches to Mundra Port","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"2079","edition":"","scale":""},{"id":267,"name":"Gulf of Kachchh","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"2080","edition":"","scale":""},{"id":268,"name":"Diu and Nawabandar Anchorages","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"2081","edition":"","scale":""},{"id":269,"name":"Approaches to Dahej","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"2082","edition":"","scale":""},{"id":270,"name":"Reliance tanker berths Approches to Sikka","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"2083","edition":"","scale":""},{"id":271,"name":"Port Pipavav","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"2100","edition":"","scale":""},{"id":272,"name":"Bhavnagar Port","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"2102","edition":"","scale":""},{"id":273,"name":"Mundra Port","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"2106","edition":"","scale":""},{"id":274,"name":"Mundra Port-West Basin","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"2107","edition":"","scale":""},{"id":275,"name":"Dahej Harbour","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"2110","edition":"","scale":""},{"id":276,"name":"Approaches To Kharo Creek & Mitha Port","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"2114","edition":"","scale":""},{"id":277,"name":"Navibandar Anchorage","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"2115","edition":"","scale":""},{"id":278,"name":"Kori Creek","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"2116","edition":"","scale":""},{"id":279,"name":"Koteshwar Jetty","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"2117","edition":"","scale":""},{"id":280,"name":"Veraval Harbour","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"2121","edition":"","scale":""},{"id":281,"name":"Salaya Channel","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"2124","edition":"","scale":""},{"id":282,"name":"Bhogat Anchorage","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"2125","edition":"","scale":""},{"id":390,"name":"Mumbai To Cape Comorin","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"22","edition":"","scale":""},{"id":392,"name":"Umargam to Satpati","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"210","edition":"","scale":""},{"id":393,"name":"Dighi (Murud -Janjira) Harbour to Ratnagiri","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"212","edition":"","scale":""},{"id":394,"name":"Ratnagiri to Vengurla","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"213","edition":"","scale":""},{"id":395,"name":"Vengurla to Betul","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"214","edition":"","scale":""},{"id":396,"name":"Betul to Belekeri","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"215","edition":"","scale":""},{"id":397,"name":"Belekeri to Kundapura","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"216","edition":"","scale":""},{"id":398,"name":"Kundapura to Kasargod","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"217","edition":"","scale":""},{"id":399,"name":"Kasargod to Tellicherry","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"218","edition":"","scale":""},{"id":400,"name":"Tellicherry to Tanurnagaram","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"219","edition":"","scale":""},{"id":401,"name":"Tanumnagaram to Manakkodam","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"220","edition":"","scale":""},{"id":402,"name":"Allepy to Quilon","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"221","edition":"","scale":""},{"id":403,"name":"Quilon to Kolachel","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"222","edition":"","scale":""},{"id":404,"name":"Appraoches to Mumbai","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"255","edition":"","scale":""},{"id":405,"name":"Dighi (Murad-Janjira) Hr to Malvan","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"256","edition":"","scale":""},{"id":406,"name":"Badagara to Kochi (Cochin)","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"259","edition":"","scale":""},{"id":408,"name":"Mumbai to New Mangalore","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"293","edition":"","scale":""},{"id":409,"name":"Mumbai Docks","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"2001","edition":"","scale":""},{"id":410,"name":"Approaches to Karwar","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"2008","edition":"","scale":""},{"id":411,"name":"Belekeri Anchorage","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"2009","edition":"","scale":""},{"id":412,"name":"Karwar Naval Harbour","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"2010","edition":"","scale":""},{"id":413,"name":"Approaches to Jaigarh and Angre Ports","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"2011","edition":"","scale":""},{"id":414,"name":"PORT OF MUMBAI","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"2015","edition":"","scale":""},{"id":426,"name":"West Coast of India  Pilot (INP 1)","price":4800,"folio":"publications","cat":"Nautical Publications","chart_no":"","edition":"","scale":""},{"id":427,"name":"BAY OF BENGAL PILOT (INP 2)","price":4800,"folio":"publications","cat":"Nautical Publications","chart_no":"","edition":"","scale":""},{"id":428,"name":"LIST OF LIGHTS VOLUME D & E (INP 21 A)","price":2500,"folio":"publications","cat":"Nautical Publications","chart_no":"","edition":"","scale":""},{"id":429,"name":"LIST OF LIGHTS VOLUME F & K (INP 21 B)","price":2500,"folio":"publications","cat":"Nautical Publications","chart_no":"","edition":"","scale":""},{"id":430,"name":"LIST OF RADIO SIGNALS (INP 31) (1)","price":3800,"folio":"publications","cat":"Nautical Publications","chart_no":"","edition":"","scale":""},{"id":431,"name":"LIST OF RADIO SIGNALS (INP 31) (2)","price":3800,"folio":"publications","cat":"Nautical Publications","chart_no":"","edition":"","scale":""},{"id":432,"name":"LIST OF RADIO SIGNALS (INP 31) (5)","price":3800,"folio":"publications","cat":"Nautical Publications","chart_no":"","edition":"","scale":""},{"id":433,"name":"LIST OF RADIO SIGNALS (INP 31) (6)","price":3800,"folio":"publications","cat":"Nautical Publications","chart_no":"","edition":"","scale":""},{"id":469,"name":"Mormugao and Panaji","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"2020","edition":"2019","scale":"25000"},{"id":470,"name":"Approaches to Mormugao","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"2022","edition":"2019","scale":"60000"},{"id":471,"name":"Daman Anchorage","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"2026","edition":"2018","scale":"25000"},{"id":472,"name":"Mirya and Ratnagin Bay","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"2028","edition":"2019","scale":"15000"},{"id":473,"name":"Srivardhan and Bankot Anchorages","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"2030","edition":"2019","scale":"1:25000"},{"id":474,"name":"Dighi Harbour (Murud-Janjira) and Approaches","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"2036","edition":"2016","scale":"25000"},{"id":475,"name":"Rajapur Bay and Vijaydurg Harbour","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"2038","edition":"2020","scale":"1:25000"},{"id":476,"name":"Malvan Anchorage","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"2041","edition":"2015","scale":"1:25000"},{"id":477,"name":"Approaches to Malvan","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"2042","edition":"2017","scale":"50000"},{"id":478,"name":"Approaches to Vengurla and Redi","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"2043","edition":"2018","scale":"60000"},{"id":479,"name":"Vengurla Anchorage","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"2046","edition":"2017","scale":"25000"},{"id":480,"name":"Port Dabhol","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"2065","edition":"2017","scale":"15000"},{"id":481,"name":"Pawas Bay-Ranpar Port","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"2074","edition":"2017","scale":"15000"},{"id":482,"name":"Jawaharlal Neheru Port and Trombay","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"2076","edition":"2023","scale":"1:20000"},{"id":483,"name":"Hamai Anchorage","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"2077","edition":"2017","scale":"30000"},{"id":484,"name":"Andaman Sea","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"41","edition":"2010","scale":"1:500000"},{"id":485,"name":"Mingalakyun (table Island) and Marshall Channel","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"401","edition":"2017","scale":"1:50000"},{"id":486,"name":"Landfall Island to Stewart Sound","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"402","edition":"2016","scale":"1:150000"},{"id":487,"name":"Stewart Sound to Elphinstone Hr.","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"403","edition":"2011","scale":"1:150000"},{"id":489,"name":"Port Blair to Little Andaman Is.","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"405","edition":"2021","scale":"1:150000"},{"id":490,"name":"Little Andaman Is to Ten Degree Channel","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"406","edition":"2021","scale":"1:150000"},{"id":491,"name":"Ten Degree Channel to Chowra Island","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"407","edition":"2015","scale":"150000"},{"id":492,"name":"Chowra Island to Nancowry Hr","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"408","edition":"2015","scale":"150000"},{"id":493,"name":"Nancowry Harbour to Great Nicobar Island","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"409","edition":"2016","scale":"150000"},{"id":495,"name":"Nicobar Islands","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"472","edition":"2019","scale":"1:500000"},{"id":496,"name":"Andaman Islands","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"473","edition":"2019","scale":"1:500000"},{"id":497,"name":"Elphinstone Harbour and Rangat Bay","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4001","edition":"2016","scale":"1:27500"},{"id":499,"name":"Port Blair","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4006","edition":"2023","scale":"1:15000"},{"id":500,"name":"Jackson Creek","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4009","edition":"2015","scale":"1:25000"},{"id":501,"name":"East Bay","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4011","edition":"2017","scale":"1:25000"},{"id":502,"name":"Port Blair Inner harbour","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4012","edition":"2023","scale":"1:5000"},{"id":503,"name":"Neil Island Pier","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4013","edition":"2016","scale":"1:10000"},{"id":504,"name":"Rangat bay to Diligent Strait","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4014","edition":"2016","scale":"1:60000"},{"id":505,"name":"Diligent Strait to Kotara Anchorage","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4017","edition":"2016","scale":"1:12500"},{"id":506,"name":"Campbell Bay","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4039","edition":"2012","scale":"1:12500"},{"id":507,"name":"Mayabandar Harbour","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4040","edition":"2018","scale":"1:7500"},{"id":508,"name":"Chowra Island","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4042","edition":"2012","scale":"1:15000"},{"id":509,"name":"Ariel Bay","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4043","edition":"2015","scale":"1:10000"},{"id":510,"name":"South Middle Strait","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4044","edition":"2014","scale":"1:12500"},{"id":511,"name":"North Middle Strait","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4045","edition":"2014","scale":"1:12500"},{"id":512,"name":"Rangat bay","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4046","edition":"2016","scale":"1:10000"},{"id":513,"name":"Landfall island","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4101","edition":"2018","scale":"1:25000"},{"id":514,"name":"West Island","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4102","edition":"2018","scale":"1:25000"},{"id":515,"name":"Interview Island","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4107","edition":"2018","scale":"1:25000"},{"id":516,"name":"Port Anson","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4111","edition":"2017","scale":"1:25000"},{"id":517,"name":"Stewart Sound","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4134","edition":"2018","scale":"1:25000"},{"id":518,"name":"Port corwallis","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4137","edition":"2019","scale":"25000"},{"id":519,"name":"Approaches to Hut Bay","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4151","edition":"2020","scale":"1:25000"},{"id":520,"name":"Dugong Creek","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4152","edition":"2019","scale":"25000"},{"id":521,"name":"Car Nicobar Island","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4161","edition":"2016","scale":"1:30000"},{"id":522,"name":"Approaches to Batti Maiv Island","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4162","edition":"2015","scale":"1:15000"},{"id":527,"name":"Elphinstone Harbour to Port Blair","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"404","edition":"2016","scale":"1:150000"},{"id":529,"name":"Little Andaman is. to Ten Degree Channel","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"406","edition":"2021","scale":"1:150000"},{"id":533,"name":"Katchall Island to Sumatera","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"471","edition":"2019","scale":"1:750000"},{"id":537,"name":"Nancowry Harbour and Approaches","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4005","edition":"2016","scale":"1:12500"},{"id":542,"name":"MANDAPAM HARBOUR","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"3016","edition":"2019","scale":"37500"},{"id":543,"name":"Approaches to Dhamra River","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"3017","edition":"2018","scale":"50000"},{"id":544,"name":"Kalingapatnam Anchorage","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"3024","edition":"2013","scale":"20000"},{"id":545,"name":"Porto Novo Anchorage","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"3025","edition":"2012","scale":"25000"},{"id":546,"name":"Approaches to Vadarevu and Nizampatnam Bay","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"3026","edition":"2018","scale":"75000"},{"id":547,"name":"Tirukkadaiyur Port","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"3029","edition":"2014","scale":"1:5000"},{"id":548,"name":"APPROACHES TO BHIMUNIPATNAM, BHIMUNIPATNAM ANCHORAGE","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"3030","edition":"2023","scale":"1:12500"},{"id":549,"name":"Karaikal port","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"3033","edition":"2013","scale":"1:12500"},{"id":550,"name":"Krishnapatnam port. Approaches to Krishnapatnam","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"3034","edition":"2022","scale":"115000"},{"id":551,"name":"Gangavaram port","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"3035","edition":"2012","scale":"1:25000"},{"id":552,"name":"Chemplast Sanmar Cuddalore Terminal","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"3036","edition":"2012","scale":"1:15000"},{"id":553,"name":"Dhamra Port","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"3037","edition":"2022","scale":"1:12500"},{"id":554,"name":"Approaches to Dhamra Port","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"3038","edition":"2022","scale":"1:25000"},{"id":555,"name":"Kattupalli Port","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"3039","edition":"2020","scale":"1:12500"},{"id":556,"name":"Rameshwaram to Adam's Bridge","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"3040","edition":"2019","scale":"1:50000"},{"id":557,"name":"Approaches to Paradip","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"3041","edition":"2015","scale":"1:60000"},{"id":558,"name":"Gopalpur Port, Gopalpur Anchorage","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"3043","edition":"2019","scale":"12500"},{"id":559,"name":"Puducherry Harbour","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"3044","edition":"2018","scale":"1:7500"},{"id":560,"name":"Kankesanturai Harbour","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"3501","edition":"2018","scale":"1:12500"},{"id":562,"name":"Chennai to Kalingapatnam","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"391","edition":"2012","scale":"1:750000"},{"id":563,"name":"Valinokkam Anchorage","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"2037","edition":"2015","scale":"30000"},{"id":564,"name":"Approaches to Chennai","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"3001","edition":"2018","scale":"50000"},{"id":565,"name":"Approaches to Vishakhapatnam","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"3002","edition":"2015","scale":"60000"},{"id":566,"name":"Cuddalore Anchorage","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"3003","edition":"2019","scale":"25000"},{"id":567,"name":"Chennai Harbour","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"3004","edition":"2016","scale":"15000"},{"id":568,"name":"Machilipatnam Anchorage","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"3005","edition":"2021","scale":"1:35000"},{"id":569,"name":"Hugli River. Kukrahatti Reach to Royapur crossing","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"3006","edition":"2017","scale":"37500"},{"id":570,"name":"Nagapattinam Anchorage","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"3007","edition":"2023","scale":"1:35000"},{"id":571,"name":"Vadarevu Anchorage","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"3008","edition":"2014","scale":"25000"},{"id":572,"name":"Kakinada Port and Anchorage","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"3009","edition":"2020","scale":"1:10000"},{"id":714,"name":"Paradip Port","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"3010","edition":"2020","scale":""},{"id":715,"name":"Hugli River-Gasper Channel to Haldia","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"3011","edition":"2017","scale":"75000"},{"id":716,"name":"Vishakhapatnam Harbour","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"3012","edition":"2020","scale":"1:12500"},{"id":717,"name":"Hugli River Haidia to Kukrahati Reach","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"3013","edition":"2017","scale":"37500"},{"id":722,"name":"Bay of Bengal Northern Portion","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"31","edition":"2017","scale":"1:1500000"},{"id":726,"name":"Kochi to Visakhapatnam","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"32","edition":"2019","scale":"1:1500000"},{"id":727,"name":"Bay of Bengal-Southern Portion","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"33","edition":"2016","scale":"1:1500000"},{"id":728,"name":"Approaches to Hugli River","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"301","edition":"2017","scale":"1:1500000"},{"id":729,"name":"SAGAR ISLAND TO DHAMRA PORT","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"302","edition":"2023","scale":"1:1500000"},{"id":730,"name":"DHAMRA PORT TO PARADIP PORT","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"303","edition":"2023","scale":"1:1500000"},{"id":731,"name":"Approaches to Chandrabhaga","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"304","edition":"2019","scale":"1:1500000"},{"id":732,"name":"Approaches to Gopalpur","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"305","edition":"2019","scale":"1:1500000"},{"id":733,"name":"Outer Approaches to Vishakhapatnam","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"308","edition":"2018","scale":"1:1500000"},{"id":734,"name":"Mamallapuram (Mahabalipuram) to point Pud","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"313","edition":"2020","scale":"1:1500000"},{"id":735,"name":"PALK STRAIT","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"315","edition":"2023","scale":"1:25000"},{"id":736,"name":"Palk Bay Eastern Portion","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"316","edition":"2023","scale":"1:50000"},{"id":737,"name":"Paradip to Pussur River","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"351","edition":"2020","scale":"1:300000"},{"id":738,"name":"Gopalpur to Paradip","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"352","edition":"2020","scale":"1:300000"},{"id":739,"name":"Kalingapatnam to Gopalpur","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"353","edition":"2021","scale":"1:300000"},{"id":740,"name":"Sacramento Shoal to Kalingapatnam","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"354","edition":"2021","scale":"1:300000"},{"id":741,"name":"Ramaypatnam to Sacramento Shoal","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"355","edition":"2022","scale":"1:300000"},{"id":742,"name":"Chennai to Ramayapatnam","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"356","edition":"2022","scale":"1:300000"},{"id":743,"name":"Approaches to Palk Bay","price":2000,"folio":"folio5","cat":"Folio 5 — East Coast","chart_no":"358","edition":"2009","scale":"1:300000"},{"id":791,"name":"Kolachel to Manappad","price":2000,"folio":"folio4","cat":"Folio 4 — Kerala & Lakshadweep","chart_no":"223","edition":"2012","scale":"1:150000"},{"id":792,"name":"Manappad to Setukkarai","price":2000,"folio":"folio4","cat":"Folio 4 — Kerala & Lakshadweep","chart_no":"224","edition":"2020","scale":"1:150000"},{"id":793,"name":"MALWAN TO KUNDAPURA","price":2000,"folio":"folio4","cat":"Folio 4 — Kerala & Lakshadweep","chart_no":"257","edition":"2019","scale":"300000"},{"id":794,"name":"Kundapura to Badagara","price":2000,"folio":"folio4","cat":"Folio 4 — Kerala & Lakshadweep","chart_no":"258","edition":"2019","scale":"1: 30000"},{"id":796,"name":"Eight Degree Channel to Kanniyakumari","price":2000,"folio":"folio4","cat":"Folio 4 — Kerala & Lakshadweep","chart_no":"261","edition":"2021","scale":"1: 300000"},{"id":797,"name":"Cape Comorin to Pamban","price":2000,"folio":"folio4","cat":"Folio 4 — Kerala & Lakshadweep","chart_no":"262","edition":"2014","scale":"1: 300000"},{"id":798,"name":"Southern Coast of Sri Lanka","price":2000,"folio":"folio4","cat":"Folio 4 — Kerala & Lakshadweep","chart_no":"264","edition":"2006","scale":"1: 300000"},{"id":799,"name":"Cora Divh to Elikalpeni Bank","price":2000,"folio":"folio4","cat":"Folio 4 — Kerala & Lakshadweep","chart_no":"272","edition":"2020","scale":"1: 500000"},{"id":800,"name":"Kadmat Island to Ihavandiffulu Atoll","price":2000,"folio":"folio4","cat":"Folio 4 — Kerala & Lakshadweep","chart_no":"273","edition":"2021","scale":"1: 500000"},{"id":801,"name":"Karwar to Beypore","price":2000,"folio":"folio4","cat":"Folio 4 — Kerala & Lakshadweep","chart_no":"294","edition":"2021","scale":"1: 750000"},{"id":802,"name":"Palk Bay-Western Portion","price":2000,"folio":"folio4","cat":"Folio 4 — Kerala & Lakshadweep","chart_no":"317","edition":"2006","scale":"1: 150000"},{"id":803,"name":"Badagara Anchorage","price":2000,"folio":"folio4","cat":"Folio 4 — Kerala & Lakshadweep","chart_no":"2003","edition":"2017","scale":"25000"},{"id":804,"name":"Kochi Harbour","price":2000,"folio":"folio4","cat":"Folio 4 — Kerala & Lakshadweep","chart_no":"2004","edition":"2015","scale":"25000"},{"id":805,"name":"Minicoy Island","price":2000,"folio":"folio4","cat":"Folio 4 — Kerala & Lakshadweep","chart_no":"2006","edition":"2019","scale":"1:25000"},{"id":806,"name":"Androth Island","price":2000,"folio":"folio4","cat":"Folio 4 — Kerala & Lakshadweep","chart_no":"2007","edition":"2020","scale":"1:30000"},{"id":807,"name":"Alleppey Anchorage","price":2000,"folio":"folio4","cat":"Folio 4 — Kerala & Lakshadweep","chart_no":"2012","edition":"2016","scale":"25000"},{"id":809,"name":"Malpe Port","price":2000,"folio":"folio4","cat":"Folio 4 — Kerala & Lakshadweep","chart_no":"2014","edition":"2014","scale":"15000"},{"id":810,"name":"Kavaratti Island","price":2000,"folio":"folio4","cat":"Folio 4 — Kerala & Lakshadweep","chart_no":"2023","edition":"2020","scale":"25000"},{"id":811,"name":"Honavar Anchorage","price":2000,"folio":"folio4","cat":"Folio 4 — Kerala & Lakshadweep","chart_no":"2024","edition":"2015","scale":"25000"},{"id":812,"name":"Approaches to Kochi (Cochin)","price":2000,"folio":"folio4","cat":"Folio 4 — Kerala & Lakshadweep","chart_no":"2029","edition":"2016","scale":"60000"},{"id":813,"name":"Nindakara and Quilon Anchorages","price":2000,"folio":"folio4","cat":"Folio 4 — Kerala & Lakshadweep","chart_no":"2032","edition":"2014","scale":"30000"},{"id":814,"name":"Kalpeni and Cheriyam Islands","price":2000,"folio":"folio4","cat":"Folio 4 — Kerala & Lakshadweep","chart_no":"2035","edition":"2015","scale":"25000"},{"id":815,"name":"Port of Kochi","price":2000,"folio":"folio4","cat":"Folio 4 — Kerala & Lakshadweep","chart_no":"2045","edition":"2017","scale":"7:500"},{"id":816,"name":"Kolachel Anchorage","price":2000,"folio":"folio4","cat":"Folio 4 — Kerala & Lakshadweep","chart_no":"2048","edition":"2014","scale":"30000"},{"id":817,"name":"Sacrifice Rock to Beypore","price":2000,"folio":"folio4","cat":"Folio 4 — Kerala & Lakshadweep","chart_no":"2053","edition":"2019","scale":"50000"},{"id":818,"name":"Cannanore and Tellicherry Anchorage","price":2000,"folio":"folio4","cat":"Folio 4 — Kerala & Lakshadweep","chart_no":"2058","edition":"2016","scale":"30000"},{"id":819,"name":"Kollam port","price":2000,"folio":"folio4","cat":"Folio 4 — Kerala & Lakshadweep","chart_no":"2104","edition":"2012","scale":"12500"},{"id":820,"name":"Vizhinjam Harbour","price":2000,"folio":"folio4","cat":"Folio 4 — Kerala & Lakshadweep","chart_no":"2111","edition":"2013","scale":"7500"},{"id":821,"name":"Azhikkal Anchorage","price":2000,"folio":"folio4","cat":"Folio 4 — Kerala & Lakshadweep","chart_no":"2118","edition":"2016","scale":"37500"},{"id":822,"name":"Beypore Anchorage","price":2000,"folio":"folio4","cat":"Folio 4 — Kerala & Lakshadweep","chart_no":"2119","edition":"2016","scale":"25000"},{"id":823,"name":"Bitra Island","price":2000,"folio":"folio4","cat":"Folio 4 — Kerala & Lakshadweep","chart_no":"2126","edition":"2021","scale":"1:7500"},{"id":824,"name":"Port of Mormugao","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"2078","edition":"2019","scale":"12500"},{"id":825,"name":"Approaches to Hazira","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"2101","edition":"2016","scale":"37500"},{"id":826,"name":"Dighi port","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"2103","edition":"2013","scale":"12500"},{"id":827,"name":"Jaigarh and Angre Ports","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"2105","edition":"2020","scale":"1:12500"},{"id":828,"name":"Essar Bulk Terminal","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"2108","edition":"2016","scale":"12500"},{"id":829,"name":"Tapi River","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"2109","edition":"2013","scale":"12500"},{"id":830,"name":"Karwar Port","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"2120","edition":"2015","scale":"15000"},{"id":831,"name":"Ulwa Channel","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"2123","edition":"2016","scale":"10000"},{"id":832,"name":"Approaches to Karwar and Beleken","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"2353","edition":"2017","scale":"50000"},{"id":833,"name":"Approaches to Tadri","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"2354","edition":"2017","scale":"50000"},{"id":834,"name":"Approaches to Honavar","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"2355","edition":"2017","scale":"50000"},{"id":835,"name":"Approaches to Shirall and Bhatkal","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"2356","edition":"2017","scale":"50000"},{"id":836,"name":"Approaches to Kundapura","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"2357","edition":"2017","scale":"50000"},{"id":837,"name":"Approaches to Hangarkatta and Malpe","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"2358","edition":"2017","scale":"50000"},{"id":838,"name":"Approaches to Port of New Mangalore","price":2000,"folio":"folio3","cat":"Folio 3 — West Coast Central","chart_no":"2359","edition":"2017","scale":"50000"},{"id":882,"name":"Assumption Island-B","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"2509","edition":"2014","scale":"7500"},{"id":883,"name":"Pungoe Wharf","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"2510","edition":"2014","scale":"1:7500"},{"id":884,"name":"Approaches to Beira Port","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"2511","edition":"2013","scale":"20000"},{"id":885,"name":"Agalega Island","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"2512","edition":"2017","scale":"37500"},{"id":886,"name":"Coetivy Island","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"2513","edition":"2013","scale":"37500"},{"id":887,"name":"Port Louis","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"2514","edition":"2018","scale":"1:12500"},{"id":888,"name":"Dar Es Salaam Harbour","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"2516","edition":"2014","scale":"1:7500"},{"id":889,"name":"Dar Es Salaam Anchorage","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"2517","edition":"2014","scale":"15000"},{"id":890,"name":"Approaches To Dar Es Salaam","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"2520","edition":"2015","scale":"30000"},{"id":891,"name":"Port of Zanzibar","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"2524","edition":"2015","scale":"20000"},{"id":892,"name":"Mauritius","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"2527","edition":"2019","scale":"1:125000"},{"id":893,"name":"Mkoani Harbour","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"2528","edition":"2016","scale":"25000"},{"id":895,"name":"Rodrigues Island","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"2531","edition":"2020","scale":"50000"},{"id":896,"name":"Approaches to Port Victoria","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"2551","edition":"2017","scale":""},{"id":897,"name":"Western Approaches to Mahe island","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"2552","edition":"2017","scale":""},{"id":898,"name":"Aldabra Island","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"2554","edition":"2017","scale":"15000"},{"id":899,"name":"Approaches To Aldabra Island","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"2555","edition":"2017","scale":"37500"},{"id":900,"name":"Inner Approaches to Port Victoria","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"2556","edition":"2021","scale":"1:12500"},{"id":901,"name":"KULHUDHUFFUSHI ANCHORAGES","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"2596","edition":"2023","scale":"1:25000"},{"id":902,"name":"Mkokoni","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"2640","edition":"2017","scale":"25000"},{"id":903,"name":"Okha to Veraval","price":2000,"folio":"folio2","cat":"Folio 2 — Gujarat & Arabian Sea","chart_no":"252","edition":"2021","scale":"1:300000"},{"id":906,"name":"Expedition and Grand Harbours","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4017","edition":"2016","scale":"1:12500"},{"id":907,"name":"Approaches to Batti Malv Island","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4162","edition":"2015","scale":"1:15000"},{"id":908,"name":"Approaches to Chowra Island","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4163","edition":"2012","scale":"1:25000"},{"id":909,"name":"Tarasa Dwip","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4164","edition":"2012","scale":"1:25000"},{"id":910,"name":"Bompoka Island","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4165","edition":"2012","scale":"1:25000"},{"id":911,"name":"Katchall Island Western Portion","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4173","edition":"2018","scale":"1:25000"},{"id":912,"name":"Tillanchang Island","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4177","edition":"2017","scale":"1:25000"},{"id":913,"name":"South Bay & Approaches","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4181","edition":"2014","scale":"1:25000"},{"id":914,"name":"Campbell Bay & Anderson Bay","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4182","edition":"2021","scale":"1:25000"},{"id":915,"name":"Approaches to Casuarina Bay","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4183","edition":"2014","scale":"1:25000"},{"id":916,"name":"Trinkat Champlong Bay","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4184","edition":"2021","scale":"1:25000"},{"id":917,"name":"Pigeon Island","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4185","edition":"2021","scale":"1:25000"},{"id":918,"name":"Landfall Island Anchorage and Approaches","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4201","edition":"2019","scale":""},{"id":919,"name":"Revello and Beresford channels","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4205","edition":"2015","scale":"1:50000"},{"id":920,"name":"Ruthland Island to Little Andaman Island","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4254","edition":"2021","scale":"1:60000"},{"id":921,"name":"Approaches to Stewart Sound","price":2000,"folio":"folio6","cat":"Folio 6 — Andaman & Nicobar","chart_no":"4255","edition":"2020","scale":"1:50000"},{"id":956,"name":"Gand Riviere Noire Bay","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"2506","edition":"2017","scale":"25000"},{"id":1052,"name":"Kiwaiyu Bay","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"2506","edition":"2017","scale":"25000"},{"id":1056,"name":"Test Bay","price":2000,"folio":"folio1","cat":"Folio 1 — Indian Ocean & East Africa","chart_no":"2641","edition":"","scale":""}];
+
+// ── localStorage cart persistence ──
+const CART_KEY = 'sm_cart';
+function loadCartLS() { try { return JSON.parse(localStorage.getItem(CART_KEY))||[]; } catch(e){ return []; } }
+function saveCartLS(c){ localStorage.setItem(CART_KEY, JSON.stringify(c)); }
+
+// ── State ──
+let state = {
+  filter: 'all',
+  search: '',
+  sort: 'default',
+  perPage: 24,
+  page: 1,
+  view: 'grid',
+  cart: loadCartLS()
+};
+
+// ── Count badges ──
+function updateCounts() {
+  const folios = ['folio1','folio2','folio3','folio4','folio5','folio6','publications','other'];
+  folios.forEach(f => {
+    const el = document.getElementById('cnt-'+f);
+    if(el) el.textContent = '('+ALL_PRODUCTS.filter(p=>p.folio===f).length+')';
+  });
+}
+
+// ── Filter + Search + Sort ──
+function getFiltered() {
+  let list = ALL_PRODUCTS;
+  if(state.filter !== 'all') list = list.filter(p => p.folio === state.filter);
+  if(state.search) {
+    const q = state.search.toLowerCase();
+    list = list.filter(p =>
+      p.name.toLowerCase().includes(q) ||
+      (p.chart_no && p.chart_no.toLowerCase().includes(q)) ||
+      (p.edition && p.edition.includes(q))
+    );
+  }
+  switch(state.sort) {
+    case 'az': list = [...list].sort((a,b)=>a.name.localeCompare(b.name)); break;
+    case 'za': list = [...list].sort((a,b)=>b.name.localeCompare(a.name)); break;
+    case 'price-asc': list = [...list].sort((a,b)=>a.price-b.price); break;
+    case 'price-desc': list = [...list].sort((a,b)=>b.price-a.price); break;
+    case 'chart-asc': list = [...list].sort((a,b)=>Number(a.chart_no||99999)-Number(b.chart_no||99999)); break;
+  }
+  return list;
+}
+
+// ── Folio colour tags ──
+const folioColors = {
+  folio1: 'bg-blue-900/60 text-blue-300 border-blue-700/40',
+  folio2: 'bg-emerald-900/60 text-emerald-300 border-emerald-700/40',
+  folio3: 'bg-violet-900/60 text-violet-300 border-violet-700/40',
+  folio4: 'bg-rose-900/60 text-rose-300 border-rose-700/40',
+  folio5: 'bg-amber-900/60 text-amber-300 border-amber-700/40',
+  folio6: 'bg-cyan-900/60 text-cyan-300 border-cyan-700/40',
+  publications: 'bg-gold-500/15 text-gold-300 border-gold-500/30',
+  other: 'bg-slate-800/60 text-slate-300 border-slate-600/40',
+};
+const folioShort = {
+  folio1:'Folio 1', folio2:'Folio 2', folio3:'Folio 3',
+  folio4:'Folio 4', folio5:'Folio 5', folio6:'Folio 6',
+  publications:'Publication', other:'Paper Chart'
+};
+
+// ── Render products ──
+function renderProducts() {
+  const filtered = getFiltered();
+  const total = filtered.length;
+  const perPage = state.perPage >= 9999 ? total : state.perPage;
+  const totalPages = Math.ceil(total / perPage);
+  state.page = Math.min(state.page, Math.max(1, totalPages));
+  const start = (state.page - 1) * perPage;
+  const slice = filtered.slice(start, start + perPage);
+
+  const container = document.getElementById('products-container');
+  const noResults = document.getElementById('no-results');
+  const resultsCount = document.getElementById('results-count');
+  const filterLabel = document.getElementById('active-filter-label');
+
+  // counts
+  resultsCount.textContent = `Showing ${slice.length} of ${total} product${total!==1?'s':''}`;
+  filterLabel.textContent = state.filter === 'all' ? '' : (folioShort[state.filter]||'');
+
+  if(!slice.length) {
+    container.innerHTML = '';
+    noResults.classList.remove('hidden');
+    document.getElementById('pagination').innerHTML = '';
+    return;
+  }
+  noResults.classList.add('hidden');
+
+  // Grid vs List
+  if(state.view === 'grid') {
+    container.className = 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5';
+  } else {
+    container.className = 'flex flex-col gap-3';
+  }
+
+  container.innerHTML = slice.map(p => {
+    const isPublication = p.folio === 'publications';
+    const tagClass = folioColors[p.folio] || folioColors.other;
+    const imgUrl = isPublication
+      ? 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&q=70'
+      : 'https://images.unsplash.com/photo-1524661135-423995f22d0b?w=400&q=70';
+    const inCart = state.cart.some(c=>c.id===p.id);
+
+    if(state.view === 'list') {
+      return `<div class="product-card flex-row flex items-center gap-4 p-3" data-id="${p.id}">
+        <div class="img-wrap w-16 h-16 rounded flex-shrink-0"><img src="${imgUrl}" alt="${esc(p.name)}" loading="lazy"/></div>
+        <div class="flex-1 min-w-0">
+          <div class="flex flex-wrap items-center gap-2 mb-1">
+            <span class="folio-tag border ${tagClass}">${folioShort[p.folio]||''}</span>
+            ${p.chart_no?`<span class="text-gold-500/60 font-condensed text-xs">No. ${p.chart_no}</span>`:''}
+          </div>
+          <h3 class="font-condensed font-bold text-white text-sm leading-snug truncate">${esc(p.name)}</h3>
+          ${p.edition?`<p class="text-slate-500 text-xs mt-0.5">Ed. ${p.edition}${p.scale?' · Scale '+p.scale:''}</p>`:''}
+        </div>
+        <div class="flex items-center gap-3 flex-shrink-0">
+          <span class="font-display font-bold text-gold-300 text-base">₹${p.price.toLocaleString('en-IN')}</span>
+          <button class="btn-cart ${inCart?'added':''}" onclick="addToCart(${p.id},this)">
+            <i class="fa-solid ${inCart?'fa-check':'fa-cart-plus'} mr-1 text-xs"></i>${inCart?'Added':'Add'}
+          </button>
+        </div>
+      </div>`;
+    }
+
+    return `<div class="product-card" data-id="${p.id}">
+      <div class="img-wrap h-40"><img src="${imgUrl}" alt="${esc(p.name)}" loading="lazy"/></div>
+      <div class="card-body">
+        <div class="flex flex-wrap items-center gap-2 mb-2">
+          <span class="folio-tag border ${tagClass}">${folioShort[p.folio]||''}</span>
+          ${p.chart_no?`<span class="text-gold-500/50 font-condensed text-[10px] uppercase tracking-wider">No. ${p.chart_no}</span>`:''}
+        </div>
+        <h3 class="font-condensed font-bold text-white text-sm leading-snug flex-1 mb-1">${esc(p.name)}</h3>
+        <p class="text-slate-500 text-xs mb-3 leading-relaxed">
+          ${[p.edition?'Ed. '+p.edition:'', p.scale?'Scale '+p.scale:''].filter(Boolean).join(' · ')||'&nbsp;'}
+        </p>
+        <div class="flex items-center justify-between mt-auto pt-2 border-t border-gold-500/10">
+          <span class="font-display font-bold text-gold-300 text-lg">₹${p.price.toLocaleString('en-IN')}</span>
+          <button class="btn-cart ${inCart?'added':''}" onclick="addToCart(${p.id},this)">
+            <i class="fa-solid ${inCart?'fa-check':'fa-cart-plus'} mr-1 text-xs"></i>${inCart?'Added':'Add to Cart'}
+          </button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  renderPagination(totalPages);
+}
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── Pagination ──
+function renderPagination(totalPages) {
+  const pg = document.getElementById('pagination');
+  if(totalPages <= 1){ pg.innerHTML=''; return; }
+  let html = '';
+  // Prev
+  html += `<button class="page-btn ${state.page<=1?'disabled':''}" onclick="goPage(${state.page-1})"><i class="fa-solid fa-chevron-left text-xs"></i></button>`;
+  // Pages
+  const range = buildRange(state.page, totalPages);
+  range.forEach(n => {
+    if(n==='...') html += `<span class="page-btn" style="cursor:default;background:none;border:none;color:#475569">…</span>`;
+    else html += `<button class="page-btn ${n===state.page?'active':''}" onclick="goPage(${n})">${n}</button>`;
+  });
+  // Next
+  html += `<button class="page-btn ${state.page>=totalPages?'disabled':''}" onclick="goPage(${state.page+1})"><i class="fa-solid fa-chevron-right text-xs"></i></button>`;
+  pg.innerHTML = html;
+}
+function buildRange(cur, total) {
+  if(total<=7) return Array.from({length:total},(_,i)=>i+1);
+  const r=[];
+  r.push(1);
+  if(cur>3) r.push('...');
+  for(let i=Math.max(2,cur-1);i<=Math.min(total-1,cur+1);i++) r.push(i);
+  if(cur<total-2) r.push('...');
+  r.push(total);
+  return r;
+}
+function goPage(n){ state.page=n; renderProducts(); window.scrollTo({top:document.getElementById('products-container').getBoundingClientRect().top+window.scrollY-100,behavior:'smooth'}); }
+
+// ── Cart ──
+function addToCart(id, btn) {
+  const p = ALL_PRODUCTS.find(x=>x.id===id);
+  if(!p) return;
+  if(!state.cart.some(c=>c.id===id)) {
+    state.cart.push({...p, qty:1});
+  } else {
+    state.cart = state.cart.map(c=>c.id===id?{...c,qty:c.qty+1}:c);
+  }
+  saveCartLS(state.cart);
+  if(btn){ btn.innerHTML='<i class="fa-solid fa-check mr-1 text-xs"></i>Added'; btn.classList.add('added'); }
+  updateCartUI();
+  showToast(p.name+' added to cart');
+}
+function removeFromCart(id){ state.cart=state.cart.filter(c=>c.id!==id); saveCartLS(state.cart); updateCartUI(); renderProducts(); }
+function updateCartUI() {
+  const total = state.cart.reduce((s,c)=>s+c.qty,0);
+  const countEl = document.getElementById('cart-count');
+  if(countEl){ countEl.textContent = total; if(total>0){ countEl.classList.remove('hidden'); } else { countEl.classList.add('hidden'); } }
+}
+
+function showToast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+// ── Filter setter (used from footer) ──
+function setFilter(folio){
+  state.filter=folio; state.page=1;
+  document.querySelectorAll('.filter-chip').forEach(b=>b.classList.toggle('active',b.dataset.folio===folio));
+  renderProducts();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── Event wiring ──
+document.querySelectorAll('.filter-chip').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    state.filter=btn.dataset.folio; state.page=1;
+    document.querySelectorAll('.filter-chip').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    renderProducts();
+  });
+});
+let searchTimer;
+document.getElementById('search-input').addEventListener('input',e=>{
+  clearTimeout(searchTimer);
+  searchTimer=setTimeout(()=>{ state.search=e.target.value.trim(); state.page=1; renderProducts(); },280);
+});
+document.getElementById('sort-select').addEventListener('change',e=>{ state.sort=e.target.value; state.page=1; renderProducts(); });
+document.getElementById('per-page-select').addEventListener('change',e=>{ state.perPage=Number(e.target.value); state.page=1; renderProducts(); });
+document.getElementById('view-grid').addEventListener('click',()=>{ state.view='grid'; document.getElementById('view-grid').classList.add('view-active'); document.getElementById('view-list').classList.remove('view-active'); renderProducts(); });
+document.getElementById('view-list').addEventListener('click',()=>{ state.view='list'; document.getElementById('view-list').classList.add('view-active'); document.getElementById('view-grid').classList.remove('view-active'); renderProducts(); });
+
+// Cart icon navigates to cart.html (handled by <a href> on cart-btn)
+
+
+// ── Mobile menu ──
+const menuBtn=document.getElementById('menu-btn'),mobileMenu=document.getElementById('mobile-menu'),menuIcon=document.getElementById('menu-icon');
+menuBtn.addEventListener('click',()=>{ mobileMenu.classList.toggle('open'); menuIcon.className=mobileMenu.classList.contains('open')?'fa-solid fa-xmark':'fa-solid fa-bars'; });
+
+// ── Scroll ──
+const scrollTopBtn=document.getElementById('scroll-top');
+window.addEventListener('scroll',()=>{ scrollTopBtn.style.opacity=window.scrollY>400?'1':'0'; scrollTopBtn.style.transform=window.scrollY>400?'translateY(0)':'translateY(1rem)'; document.getElementById('navbar').classList.toggle('py-0',window.scrollY>60); });
+scrollTopBtn.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+
+// ── Reveal ──
+const revealEls=document.querySelectorAll('.reveal');
+const revealObserver=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');revealObserver.unobserve(e.target);}}),{threshold:.08});
+revealEls.forEach(el=>revealObserver.observe(el));
+
+// ── Init ──
+updateCounts();
+updateCartUI();
+renderProducts();
+</script>
+</body>
+</html>
