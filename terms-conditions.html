@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="./img/logo.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Terms &amp; Conditions – Shellback Marines</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: {
+              950: '#020b18',
+              900: '#041424',
+              800: '#072238',
+              700: '#0c3454',
+              600: '#114a76',
+              500: '#155f98',
+            },
+            ocean: {
+              500: '#0e7490',
+              400: '#0891b2',
+              300: '#22d3ee',
+            },
+            gold: {
+              500: '#c8922a',
+              400: '#d4a843',
+              300: '#e8c76a',
+              200: '#fde68a',
+            },
+          },
+          fontFamily: {
+            display: ['Playfair Display', 'serif'],
+            body:    ['Barlow', 'sans-serif'],
+            condensed: ['Barlow Condensed', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Barlow', sans-serif; background: #020b18; color: #e2e8f0; overflow-x: hidden; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #041424; }
+    ::-webkit-scrollbar-thumb { background: #c8922a; border-radius: 3px; }
+
+    .map-grid {
+      background-image:
+        linear-gradient(rgba(200,146,42,0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(200,146,42,0.07) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    .page-hero {
+      background-image:
+        linear-gradient(to bottom, rgba(2,11,24,0.45) 0%, rgba(2,11,24,0.72) 60%, rgba(2,11,24,1) 100%),
+        url('https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=1800&q=80');
+      background-size: cover;
+      background-position: center 55%;
+    }
+
+    .glass-nav {
+      backdrop-filter: blur(16px) saturate(160%);
+      -webkit-backdrop-filter: blur(16px) saturate(160%);
+      background: rgba(2,11,24,0.78);
+      border-bottom: 1px solid rgba(200,146,42,0.18);
+    }
+
+    .gold-divider-left {
+      height: 2px;
+      background: linear-gradient(90deg, #c8922a, transparent);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(32px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes spin-slow { to { transform: rotate(360deg); } }
+    .compass-spin { animation: spin-slow 30s linear infinite; }
+    .fade-up  { animation: fadeUp 0.9s ease both; }
+    .delay-1  { animation-delay: 0.15s; }
+    .delay-2  { animation-delay: 0.35s; }
+    .delay-3  { animation-delay: 0.55s; }
+
+    .reveal       { opacity: 0; transform: translateY(28px);  transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible       { opacity: 1; transform: translateY(0); }
+    .reveal-left  { opacity: 0; transform: translateX(-30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal-left.visible  { opacity: 1; transform: translateX(0); }
+    .reveal-right { opacity: 0; transform: translateX(30px);  transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal-right.visible { opacity: 1; transform: translateX(0); }
+
+    .nav-link { position: relative; }
+    .nav-link::after {
+      content: ''; position: absolute; bottom: -4px; left: 0;
+      width: 0; height: 1px; background: #c8922a; transition: width 0.3s ease;
+    }
+    .nav-link:hover::after { width: 100%; }
+
+    .coord-text {
+      font-family: 'Barlow Condensed', sans-serif;
+      letter-spacing: 0.15em;
+      color: rgba(200,146,42,0.5);
+      font-size: 0.65rem;
+    }
+
+    #mobile-menu { transition: max-height 0.4s ease, opacity 0.4s ease; max-height: 0; opacity: 0; overflow: hidden; }
+    #mobile-menu.open { max-height: 500px; opacity: 1; }
+
+    /* Section card */
+    .policy-section {
+      border-left: 3px solid rgba(200,146,42,0.35);
+      background: linear-gradient(135deg, rgba(7,34,56,0.6), rgba(4,20,36,0.8));
+      border-radius: 0 4px 4px 0;
+      transition: border-color 0.3s ease;
+    }
+    .policy-section:hover { border-color: #c8922a; }
+
+    /* ToC hover */
+    .toc-item { transition: color 0.2s ease, padding-left 0.2s ease; }
+    .toc-item:hover { color: #d4a843; padding-left: 4px; }
+
+    /* Note / callout box */
+    .note-box {
+      background: rgba(200,146,42,0.07);
+      border: 1px solid rgba(200,146,42,0.2);
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+
+<!-- ══════════════════════════════════════════
+     NAVBAR
+══════════════════════════════════════════ -->
+<header id="navbar" class="fixed top-0 left-0 right-0 z-50 glass-nav">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16 lg:h-20">
+
+      <a href="index.html" class="flex items-center gap-3 group">
+        <img src="./img/logo.png" alt="Shellback Marines Logo"
+             class="w-10 h-10 lg:w-12 lg:h-12 rounded-full object-contain border-2 border-gold-500 group-hover:border-gold-300 transition-colors bg-navy-800" />
+        <div>
+          <div class="font-display font-bold text-white text-base lg:text-lg leading-tight">Shellback Marines</div>
+          <div class="coord-text hidden sm:block">HYDROGRAPHIC PRODUCTS &amp; NAUTICAL CHARTS</div>
+        </div>
+      </a>
+
+      <nav class="hidden lg:flex items-center gap-8">
+        <a href="index.html"        class="nav-link text-slate-300 hover:text-gold-300 font-body text-sm font-medium transition-colors">Home</a>
+        <a href="about.html"        class="nav-link text-slate-300 hover:text-gold-300 font-body text-sm font-medium transition-colors">About Us</a>
+        <a href="products.html"     class="nav-link text-slate-300 hover:text-gold-300 font-body text-sm font-medium transition-colors">Products</a>
+        <a href="index.html#why-us" class="nav-link text-slate-300 hover:text-gold-300 font-body text-sm font-medium transition-colors">Why Us</a>
+        <a href="contact.html"      class="nav-link text-slate-300 hover:text-gold-300 font-body text-sm font-medium transition-colors">Contact</a>
+        <a href="shop.html" class="bg-gold-500 hover:bg-gold-400 text-navy-950 font-condensed font-bold text-sm px-5 py-2.5 uppercase tracking-wider transition-colors rounded-sm">
+          <i class="fa-solid fa-store mr-1.5"></i>Shop Now
+        </a>
+      </nav>
+
+      <button id="menu-btn" class="lg:hidden text-gold-400 text-2xl p-2" aria-label="Toggle menu">
+        <i id="menu-icon" class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+  </div>
+
+  <div id="mobile-menu" class="lg:hidden bg-navy-900 border-t border-gold-500/20">
+    <div class="px-4 py-4 flex flex-col gap-1">
+      <a href="index.html"        class="text-slate-300 hover:text-gold-300 py-2.5 border-b border-white/5 font-body">Home</a>
+      <a href="about.html"        class="text-slate-300 hover:text-gold-300 py-2.5 border-b border-white/5 font-body">About Us</a>
+      <a href="products.html"     class="text-slate-300 hover:text-gold-300 py-2.5 border-b border-white/5 font-body">Products</a>
+      <a href="index.html#why-us" class="text-slate-300 hover:text-gold-300 py-2.5 border-b border-white/5 font-body">Why Us</a>
+      <a href="contact.html"      class="text-slate-300 hover:text-gold-300 py-2.5 border-b border-white/5 font-body">Contact</a>
+      <a href="shop.html" class="mt-3 bg-gold-500 text-navy-950 font-condensed font-bold text-sm px-5 py-3 uppercase tracking-wider text-center rounded-sm">
+        <i class="fa-solid fa-store mr-1.5"></i>Shop Now
+      </a>
+    </div>
+  </div>
+</header>
+
+
+<!-- ══════════════════════════════════════════
+     PAGE HERO
+══════════════════════════════════════════ -->
+<section class="relative page-hero map-grid pt-32 pb-24 lg:pt-44 lg:pb-32 flex items-center">
+  <div class="absolute top-20 right-8 opacity-10 compass-spin" aria-hidden="true">
+    <i class="fa-solid fa-compass text-gold-400 text-8xl lg:text-9xl"></i>
+  </div>
+  <div class="absolute bottom-10 left-6 coord-text">N 22°34.8′ / E 88°21.6′ — JALPAIGURI, WB</div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+    <nav class="flex items-center gap-2 text-xs font-condensed uppercase tracking-wider text-slate-500 mb-6 fade-up">
+      <a href="index.html" class="hover:text-gold-400 transition-colors">Home</a>
+      <i class="fa-solid fa-chevron-right text-gold-500/40 text-[10px]"></i>
+      <span class="text-gold-400">Terms &amp; Conditions</span>
+    </nav>
+
+    <div class="max-w-2xl">
+      <div class="flex items-center gap-3 mb-5 fade-up">
+        <div class="h-px w-10 bg-gold-500"></div>
+        <span class="coord-text text-gold-400 tracking-widest text-xs uppercase font-condensed">Legal Agreement</span>
+      </div>
+      <h1 class="font-display font-black text-white text-4xl lg:text-6xl leading-tight mb-5 fade-up delay-1">
+        Terms &amp; <span class="text-gold-400">Conditions</span>
+      </h1>
+      <p class="text-slate-300 text-lg leading-relaxed fade-up delay-2">
+        Please read these terms carefully before accessing or using our website. By using our services, you agree to be bound by the conditions set out below.
+      </p>
+      <div class="flex items-center gap-3 mt-6 fade-up delay-3">
+        <i class="fa-solid fa-scale-balanced text-gold-500/60 text-sm"></i>
+        <span class="text-slate-500 text-sm font-condensed uppercase tracking-wider">Governed by the Laws of India</span>
+      </div>
+    </div>
+  </div>
+  <div class="absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-t from-navy-950 to-transparent pointer-events-none"></div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     MAIN CONTENT
+══════════════════════════════════════════ -->
+<section class="bg-navy-950 py-20 lg:py-28">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid lg:grid-cols-3 gap-12 items-start">
+
+      <!-- ── Sticky Table of Contents ── -->
+      <aside class="lg:col-span-1 reveal-left lg:sticky lg:top-28">
+        <div class="bg-navy-800 border border-gold-500/20 rounded p-6">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-8 h-8 bg-gold-500/10 border border-gold-500/30 rounded flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-list text-gold-400 text-xs"></i>
+            </div>
+            <h2 class="font-condensed font-bold text-white uppercase tracking-wider text-sm">Sections</h2>
+          </div>
+          <div class="gold-divider-left w-full mb-5"></div>
+          <nav>
+            <ol class="space-y-2.5">
+              <li><a href="#overview"     class="toc-item flex items-start gap-2.5 text-slate-400 hover:text-gold-300 text-sm"><span class="text-gold-500/60 font-condensed text-xs mt-0.5 flex-shrink-0 w-6">00</span>Overview</a></li>
+              <li><a href="#s1"           class="toc-item flex items-start gap-2.5 text-slate-400 hover:text-gold-300 text-sm"><span class="text-gold-500/60 font-condensed text-xs mt-0.5 flex-shrink-0 w-6">01</span>Online Store Terms</a></li>
+              <li><a href="#s2"           class="toc-item flex items-start gap-2.5 text-slate-400 hover:text-gold-300 text-sm"><span class="text-gold-500/60 font-condensed text-xs mt-0.5 flex-shrink-0 w-6">02</span>General Conditions</a></li>
+              <li><a href="#s3"           class="toc-item flex items-start gap-2.5 text-slate-400 hover:text-gold-300 text-sm"><span class="text-gold-500/60 font-condensed text-xs mt-0.5 flex-shrink-0 w-6">03</span>Accuracy of Information</a></li>
+              <li><a href="#s4"           class="toc-item flex items-start gap-2.5 text-slate-400 hover:text-gold-300 text-sm"><span class="text-gold-500/60 font-condensed text-xs mt-0.5 flex-shrink-0 w-6">04</span>Modifications &amp; Prices</a></li>
+              <li><a href="#s5"           class="toc-item flex items-start gap-2.5 text-slate-400 hover:text-gold-300 text-sm"><span class="text-gold-500/60 font-condensed text-xs mt-0.5 flex-shrink-0 w-6">05</span>Products &amp; Services</a></li>
+              <li><a href="#s6"           class="toc-item flex items-start gap-2.5 text-slate-400 hover:text-gold-300 text-sm"><span class="text-gold-500/60 font-condensed text-xs mt-0.5 flex-shrink-0 w-6">06</span>Billing &amp; Account Info</a></li>
+              <li><a href="#s7"           class="toc-item flex items-start gap-2.5 text-slate-400 hover:text-gold-300 text-sm"><span class="text-gold-500/60 font-condensed text-xs mt-0.5 flex-shrink-0 w-6">07</span>Optional Tools</a></li>
+              <li><a href="#s8"           class="toc-item flex items-start gap-2.5 text-slate-400 hover:text-gold-300 text-sm"><span class="text-gold-500/60 font-condensed text-xs mt-0.5 flex-shrink-0 w-6">08</span>Third-Party Links</a></li>
+              <li><a href="#s9"           class="toc-item flex items-start gap-2.5 text-slate-400 hover:text-gold-300 text-sm"><span class="text-gold-500/60 font-condensed text-xs mt-0.5 flex-shrink-0 w-6">09</span>Comments &amp; Submissions</a></li>
+              <li><a href="#s10"          class="toc-item flex items-start gap-2.5 text-slate-400 hover:text-gold-300 text-sm"><span class="text-gold-500/60 font-condensed text-xs mt-0.5 flex-shrink-0 w-6">10</span>Personal Information</a></li>
+              <li><a href="#s11"          class="toc-item flex items-start gap-2.5 text-slate-400 hover:text-gold-300 text-sm"><span class="text-gold-500/60 font-condensed text-xs mt-0.5 flex-shrink-0 w-6">11</span>Errors &amp; Omissions</a></li>
+              <li><a href="#s12"          class="toc-item flex items-start gap-2.5 text-slate-400 hover:text-gold-300 text-sm"><span class="text-gold-500/60 font-condensed text-xs mt-0.5 flex-shrink-0 w-6">12</span>Prohibited Uses</a></li>
+              <li><a href="#s13"          class="toc-item flex items-start gap-2.5 text-slate-400 hover:text-gold-300 text-sm"><span class="text-gold-500/60 font-condensed text-xs mt-0.5 flex-shrink-0 w-6">13</span>Disclaimer &amp; Liability</a></li>
+              <li><a href="#s14"          class="toc-item flex items-start gap-2.5 text-slate-400 hover:text-gold-300 text-sm"><span class="text-gold-500/60 font-condensed text-xs mt-0.5 flex-shrink-0 w-6">14</span>Indemnification</a></li>
+              <li><a href="#s15"          class="toc-item flex items-start gap-2.5 text-slate-400 hover:text-gold-300 text-sm"><span class="text-gold-500/60 font-condensed text-xs mt-0.5 flex-shrink-0 w-6">15</span>Severability</a></li>
+              <li><a href="#s16"          class="toc-item flex items-start gap-2.5 text-slate-400 hover:text-gold-300 text-sm"><span class="text-gold-500/60 font-condensed text-xs mt-0.5 flex-shrink-0 w-6">16</span>Termination</a></li>
+              <li><a href="#s17"          class="toc-item flex items-start gap-2.5 text-slate-400 hover:text-gold-300 text-sm"><span class="text-gold-500/60 font-condensed text-xs mt-0.5 flex-shrink-0 w-6">17</span>Entire Agreement</a></li>
+              <li><a href="#s18"          class="toc-item flex items-start gap-2.5 text-slate-400 hover:text-gold-300 text-sm"><span class="text-gold-500/60 font-condensed text-xs mt-0.5 flex-shrink-0 w-6">18</span>Governing Law</a></li>
+              <li><a href="#s19"          class="toc-item flex items-start gap-2.5 text-slate-400 hover:text-gold-300 text-sm"><span class="text-gold-500/60 font-condensed text-xs mt-0.5 flex-shrink-0 w-6">19</span>Changes to Terms</a></li>
+              <li><a href="#s20"          class="toc-item flex items-start gap-2.5 text-slate-400 hover:text-gold-300 text-sm"><span class="text-gold-500/60 font-condensed text-xs mt-0.5 flex-shrink-0 w-6">20</span>Contact Information</a></li>
+            </ol>
+          </nav>
+
+          <div class="mt-8 pt-6 border-t border-gold-500/10 space-y-3">
+            <p class="text-slate-500 text-xs font-condensed uppercase tracking-wider">Legal Queries?</p>
+            <a href="mailto:abhisek@shellbackmarines.com" class="flex items-center gap-2 text-gold-300 hover:text-gold-200 text-sm transition-colors">
+              <i class="fa-solid fa-envelope text-gold-500/60 text-xs flex-shrink-0"></i>
+              abhisek@shellbackmarines.com
+            </a>
+          </div>
+        </div>
+      </aside>
+
+
+      <!-- ── Sections ── -->
+      <div class="lg:col-span-2 space-y-8 reveal-right">
+
+        <!-- Intro label -->
+        <div class="mb-2">
+          <span class="font-condensed text-gold-400 uppercase tracking-widest text-sm">Legal Agreement</span>
+          <h2 class="font-display font-bold text-white text-3xl lg:text-4xl mt-3 mb-6 leading-tight">
+            Our Terms of <span class="text-gold-400">Service</span>
+          </h2>
+          <div class="gold-divider-left w-16 mb-6"></div>
+          <p class="text-slate-300 leading-relaxed">
+            This website is operated by <span class="text-gold-300 font-medium">Shellback Marines</span>. Throughout the site, the terms "we", "us" and "our" refer to Shellback Marines. By visiting our site and/or purchasing from us, you agree to be bound by the following terms and conditions.
+          </p>
+        </div>
+
+        <!-- OVERVIEW -->
+        <div id="overview" class="policy-section px-6 py-7 reveal">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 bg-navy-700 border border-gold-500/25 rounded flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-file-lines text-gold-400 text-sm"></i>
+            </div>
+            <div>
+              <span class="coord-text text-[0.6rem]">OVERVIEW</span>
+              <h3 class="font-display font-bold text-white text-xl leading-tight">Overview</h3>
+            </div>
+          </div>
+          <p class="text-slate-300 leading-relaxed mb-4">
+            Shellback Marines offers this website — including all information, tools, and services — to you conditioned upon your acceptance of all terms, conditions, policies, and notices stated here. These Terms of Service apply to all users of the site, including browsers, vendors, customers, merchants, and contributors of content.
+          </p>
+          <p class="text-slate-300 leading-relaxed mb-4">
+            Please read these Terms of Service carefully before accessing or using our website. By accessing any part of the site, you agree to be bound by these Terms. If you do not agree to all the terms, you may not access the website or use any services.
+          </p>
+          <div class="note-box p-4">
+            <div class="flex items-start gap-3">
+              <i class="fa-solid fa-circle-info text-gold-400 mt-0.5 flex-shrink-0 text-sm"></i>
+              <p class="text-slate-400 text-sm leading-relaxed">
+                Any new features or tools added to the current store shall also be subject to these Terms. We reserve the right to update, change, or replace any part of these Terms by posting updates on our website. Your continued use of the website after any changes constitutes acceptance of those changes.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 1 -->
+        <div id="s1" class="policy-section px-6 py-7 reveal">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 bg-navy-700 border border-gold-500/25 rounded flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-store text-gold-400 text-sm"></i>
+            </div>
+            <div>
+              <span class="coord-text text-[0.6rem]">SECTION 01</span>
+              <h3 class="font-display font-bold text-white text-xl leading-tight">Online Store Terms</h3>
+            </div>
+          </div>
+          <ul class="space-y-3">
+            <li class="flex items-start gap-3 text-slate-300 text-sm leading-relaxed">
+              <i class="fa-solid fa-circle-check text-gold-400 mt-0.5 flex-shrink-0"></i>
+              By agreeing to these Terms, you confirm you are at least the age of majority in your state or province of residence, or have given consent to allow minor dependents to use this site.
+            </li>
+            <li class="flex items-start gap-3 text-slate-300 text-sm leading-relaxed">
+              <i class="fa-solid fa-circle-check text-gold-400 mt-0.5 flex-shrink-0"></i>
+              You may not use our products for any illegal or unauthorised purpose, nor violate any laws in your jurisdiction (including copyright laws).
+            </li>
+            <li class="flex items-start gap-3 text-slate-300 text-sm leading-relaxed">
+              <i class="fa-solid fa-circle-check text-gold-400 mt-0.5 flex-shrink-0"></i>
+              You must not transmit any worms, viruses, or code of a destructive nature.
+            </li>
+            <li class="flex items-start gap-3 text-slate-300 text-sm leading-relaxed">
+              <i class="fa-solid fa-circle-check text-gold-400 mt-0.5 flex-shrink-0"></i>
+              A breach or violation of any of the Terms will result in immediate termination of your Services.
+            </li>
+          </ul>
+        </div>
+
+        <!-- SECTION 2 -->
+        <div id="s2" class="policy-section px-6 py-7 reveal">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 bg-navy-700 border border-gold-500/25 rounded flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-gavel text-gold-400 text-sm"></i>
+            </div>
+            <div>
+              <span class="coord-text text-[0.6rem]">SECTION 02</span>
+              <h3 class="font-display font-bold text-white text-xl leading-tight">General Conditions</h3>
+            </div>
+          </div>
+          <ul class="space-y-3">
+            <li class="flex items-start gap-3 text-slate-300 text-sm leading-relaxed">
+              <i class="fa-solid fa-chevron-right text-gold-500/50 mt-0.5 flex-shrink-0 text-xs"></i>
+              We reserve the right to refuse service to anyone for any reason at any time.
+            </li>
+            <li class="flex items-start gap-3 text-slate-300 text-sm leading-relaxed">
+              <i class="fa-solid fa-chevron-right text-gold-500/50 mt-0.5 flex-shrink-0 text-xs"></i>
+              Your content (excluding credit card information) may be transferred unencrypted and involve transmissions over various networks. Credit card information is always encrypted during transfer.
+            </li>
+            <li class="flex items-start gap-3 text-slate-300 text-sm leading-relaxed">
+              <i class="fa-solid fa-chevron-right text-gold-500/50 mt-0.5 flex-shrink-0 text-xs"></i>
+              You agree not to reproduce, duplicate, copy, sell, resell, or exploit any portion of the Service without express written permission from us.
+            </li>
+          </ul>
+        </div>
+
+        <!-- SECTION 3 -->
+        <div id="s3" class="policy-section px-6 py-7 reveal">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 bg-navy-700 border border-gold-500/25 rounded flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-circle-info text-gold-400 text-sm"></i>
+            </div>
+            <div>
+              <span class="coord-text text-[0.6rem]">SECTION 03</span>
+              <h3 class="font-display font-bold text-white text-xl leading-tight">Accuracy, Completeness &amp; Timeliness of Information</h3>
+            </div>
+          </div>
+          <p class="text-slate-300 leading-relaxed mb-4">
+            We are not responsible if information made available on this site is not accurate, complete, or current. The material on this site is provided for general information only and should not be relied upon as the sole basis for making decisions.
+          </p>
+          <p class="text-slate-300 leading-relaxed">
+            This site may contain certain historical information provided for reference only. We reserve the right to modify the contents of this site at any time, but have no obligation to update any information. Any reliance on the material on this site is at your own risk.
+          </p>
+        </div>
+
+        <!-- SECTION 4 -->
+        <div id="s4" class="policy-section px-6 py-7 reveal">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 bg-navy-700 border border-gold-500/25 rounded flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-rotate text-gold-400 text-sm"></i>
+            </div>
+            <div>
+              <span class="coord-text text-[0.6rem]">SECTION 04</span>
+              <h3 class="font-display font-bold text-white text-xl leading-tight">Modifications to the Service &amp; Prices</h3>
+            </div>
+          </div>
+          <ul class="space-y-3">
+            <li class="flex items-start gap-3 text-slate-300 text-sm leading-relaxed">
+              <i class="fa-solid fa-chevron-right text-gold-500/50 mt-0.5 flex-shrink-0 text-xs"></i>
+              Prices for our products are subject to change without notice.
+            </li>
+            <li class="flex items-start gap-3 text-slate-300 text-sm leading-relaxed">
+              <i class="fa-solid fa-chevron-right text-gold-500/50 mt-0.5 flex-shrink-0 text-xs"></i>
+              We reserve the right to modify or discontinue the Service (or any part thereof) without notice at any time.
+            </li>
+            <li class="flex items-start gap-3 text-slate-300 text-sm leading-relaxed">
+              <i class="fa-solid fa-chevron-right text-gold-500/50 mt-0.5 flex-shrink-0 text-xs"></i>
+              We shall not be liable to you or any third party for any modification, price change, suspension, or discontinuance of the Service.
+            </li>
+          </ul>
+        </div>
+
+        <!-- SECTION 5 -->
+        <div id="s5" class="policy-section px-6 py-7 reveal">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 bg-navy-700 border border-gold-500/25 rounded flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-boxes-stacked text-gold-400 text-sm"></i>
+            </div>
+            <div>
+              <span class="coord-text text-[0.6rem]">SECTION 05</span>
+              <h3 class="font-display font-bold text-white text-xl leading-tight">Products or Services</h3>
+            </div>
+          </div>
+          <p class="text-slate-300 leading-relaxed mb-4">
+            Certain products or services may be available exclusively online through the website. These products may have limited quantities and are subject to return or exchange only according to our Return Policy.
+          </p>
+          <ul class="space-y-3">
+            <li class="flex items-start gap-3 text-slate-300 text-sm leading-relaxed">
+              <i class="fa-solid fa-chevron-right text-gold-500/50 mt-0.5 flex-shrink-0 text-xs"></i>
+              We have made every effort to display product colours and images as accurately as possible; however, we cannot guarantee your monitor's colour accuracy.
+            </li>
+            <li class="flex items-start gap-3 text-slate-300 text-sm leading-relaxed">
+              <i class="fa-solid fa-chevron-right text-gold-500/50 mt-0.5 flex-shrink-0 text-xs"></i>
+              We reserve the right to limit sales of products or services to any person, geographic region, or jurisdiction, and to limit quantities of any products offered.
+            </li>
+            <li class="flex items-start gap-3 text-slate-300 text-sm leading-relaxed">
+              <i class="fa-solid fa-chevron-right text-gold-500/50 mt-0.5 flex-shrink-0 text-xs"></i>
+              All product descriptions and pricing are subject to change at any time, at our sole discretion. We reserve the right to discontinue any product at any time.
+            </li>
+          </ul>
+        </div>
+
+        <!-- SECTION 6 -->
+        <div id="s6" class="policy-section px-6 py-7 reveal">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 bg-navy-700 border border-gold-500/25 rounded flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-receipt text-gold-400 text-sm"></i>
+            </div>
+            <div>
+              <span class="coord-text text-[0.6rem]">SECTION 06</span>
+              <h3 class="font-display font-bold text-white text-xl leading-tight">Accuracy of Billing &amp; Account Information</h3>
+            </div>
+          </div>
+          <p class="text-slate-300 leading-relaxed mb-4">
+            We reserve the right to refuse any order you place with us. We may, in our sole discretion, limit or cancel quantities purchased per person, per household, or per order — including orders placed under the same customer account, credit card, or billing/shipping address.
+          </p>
+          <p class="text-slate-300 leading-relaxed">
+            You agree to provide current, complete, and accurate purchase and account information for all purchases. You agree to promptly update your account information — including email address and credit card details — so we can complete your transactions and contact you as needed.
+          </p>
+        </div>
+
+        <!-- SECTION 7 -->
+        <div id="s7" class="policy-section px-6 py-7 reveal">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 bg-navy-700 border border-gold-500/25 rounded flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-screwdriver-wrench text-gold-400 text-sm"></i>
+            </div>
+            <div>
+              <span class="coord-text text-[0.6rem]">SECTION 07</span>
+              <h3 class="font-display font-bold text-white text-xl leading-tight">Optional Tools</h3>
+            </div>
+          </div>
+          <p class="text-slate-300 leading-relaxed mb-4">
+            We may provide you with access to third-party tools over which we neither monitor nor have any control. You acknowledge that we provide access to such tools "as is" and "as available" without any warranties or endorsement of any kind.
+          </p>
+          <div class="note-box p-4">
+            <div class="flex items-start gap-3">
+              <i class="fa-solid fa-triangle-exclamation text-gold-400 mt-0.5 flex-shrink-0 text-sm"></i>
+              <p class="text-slate-400 text-sm leading-relaxed">
+                Any use of optional tools offered through the site is entirely at your own risk. We shall have no liability arising from or relating to your use of such third-party tools.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 8 -->
+        <div id="s8" class="policy-section px-6 py-7 reveal">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 bg-navy-700 border border-gold-500/25 rounded flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-link text-gold-400 text-sm"></i>
+            </div>
+            <div>
+              <span class="coord-text text-[0.6rem]">SECTION 08</span>
+              <h3 class="font-display font-bold text-white text-xl leading-tight">Third-Party Links</h3>
+            </div>
+          </div>
+          <p class="text-slate-300 leading-relaxed mb-4">
+            Certain content, products, and services available via our Service may include materials from third parties. Third-party links on this site may direct you to third-party websites that are not affiliated with us.
+          </p>
+          <p class="text-slate-300 leading-relaxed">
+            We are not responsible for examining or evaluating the content or accuracy of third-party materials or websites, and we will not have any liability or responsibility for them. Complaints or claims regarding third-party products should be directed to the third party directly.
+          </p>
+        </div>
+
+        <!-- SECTION 9 -->
+        <div id="s9" class="policy-section px-6 py-7 reveal">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 bg-navy-700 border border-gold-500/25 rounded flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-comments text-gold-400 text-sm"></i>
+            </div>
+            <div>
+              <span class="coord-text text-[0.6rem]">SECTION 09</span>
+              <h3 class="font-display font-bold text-white text-xl leading-tight">User Comments, Feedback &amp; Submissions</h3>
+            </div>
+          </div>
+          <p class="text-slate-300 leading-relaxed mb-4">
+            If you send us creative ideas, suggestions, proposals, or other materials (collectively, "comments"), you agree that we may, at any time and without restriction, use those comments in any medium. We are under no obligation to maintain any comments in confidence, pay compensation, or respond to any comments.
+          </p>
+          <ul class="space-y-3">
+            <li class="flex items-start gap-3 text-slate-300 text-sm leading-relaxed">
+              <i class="fa-solid fa-chevron-right text-gold-500/50 mt-0.5 flex-shrink-0 text-xs"></i>
+              You agree that your comments will not violate any third-party rights, including copyright, trademark, or privacy rights.
+            </li>
+            <li class="flex items-start gap-3 text-slate-300 text-sm leading-relaxed">
+              <i class="fa-solid fa-chevron-right text-gold-500/50 mt-0.5 flex-shrink-0 text-xs"></i>
+              Your comments must not contain unlawful, abusive, or obscene material, or any computer virus or malware.
+            </li>
+            <li class="flex items-start gap-3 text-slate-300 text-sm leading-relaxed">
+              <i class="fa-solid fa-chevron-right text-gold-500/50 mt-0.5 flex-shrink-0 text-xs"></i>
+              You are solely responsible for any comments you make and their accuracy.
+            </li>
+          </ul>
+        </div>
+
+        <!-- SECTION 10 -->
+        <div id="s10" class="policy-section px-6 py-7 reveal">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 bg-navy-700 border border-gold-500/25 rounded flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-user-shield text-gold-400 text-sm"></i>
+            </div>
+            <div>
+              <span class="coord-text text-[0.6rem]">SECTION 10</span>
+              <h3 class="font-display font-bold text-white text-xl leading-tight">Personal Information</h3>
+            </div>
+          </div>
+          <p class="text-slate-300 leading-relaxed">
+            Your submission of personal information through the store is governed by our
+            <a href="privacy-policy.html" class="text-gold-300 hover:text-gold-200 transition-colors font-medium underline underline-offset-2">Privacy Policy</a>.
+            Please review it to understand how we collect, use, and protect your data.
+          </p>
+        </div>
+
+        <!-- SECTION 11 -->
+        <div id="s11" class="policy-section px-6 py-7 reveal">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 bg-navy-700 border border-gold-500/25 rounded flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-spell-check text-gold-400 text-sm"></i>
+            </div>
+            <div>
+              <span class="coord-text text-[0.6rem]">SECTION 11</span>
+              <h3 class="font-display font-bold text-white text-xl leading-tight">Errors, Inaccuracies &amp; Omissions</h3>
+            </div>
+          </div>
+          <p class="text-slate-300 leading-relaxed mb-4">
+            Occasionally there may be information on our site that contains typographical errors, inaccuracies, or omissions relating to product descriptions, pricing, promotions, shipping charges, or availability. We reserve the right to correct any such errors and to change or update information or cancel orders at any time without prior notice.
+          </p>
+          <p class="text-slate-300 leading-relaxed">
+            We undertake no obligation to update, amend, or clarify information in the Service or on any related website, including pricing information, except as required by law.
+          </p>
+        </div>
+
+        <!-- SECTION 12 -->
+        <div id="s12" class="policy-section px-6 py-7 reveal">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 bg-navy-700 border border-gold-500/25 rounded flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-ban text-gold-400 text-sm"></i>
+            </div>
+            <div>
+              <span class="coord-text text-[0.6rem]">SECTION 12</span>
+              <h3 class="font-display font-bold text-white text-xl leading-tight">Prohibited Uses</h3>
+            </div>
+          </div>
+          <p class="text-slate-300 leading-relaxed mb-5">In addition to other prohibitions set forth in these Terms, you are prohibited from using the site or its content for:</p>
+          <div class="grid sm:grid-cols-2 gap-3">
+            <div class="flex items-start gap-3 bg-navy-900/60 border border-gold-500/10 rounded px-4 py-3">
+              <i class="fa-solid fa-xmark text-gold-500/60 mt-0.5 flex-shrink-0 text-sm"></i>
+              <span class="text-slate-300 text-sm">Any unlawful purpose or soliciting unlawful acts</span>
+            </div>
+            <div class="flex items-start gap-3 bg-navy-900/60 border border-gold-500/10 rounded px-4 py-3">
+              <i class="fa-solid fa-xmark text-gold-500/60 mt-0.5 flex-shrink-0 text-sm"></i>
+              <span class="text-slate-300 text-sm">Violating international, federal, or local regulations</span>
+            </div>
+            <div class="flex items-start gap-3 bg-navy-900/60 border border-gold-500/10 rounded px-4 py-3">
+              <i class="fa-solid fa-xmark text-gold-500/60 mt-0.5 flex-shrink-0 text-sm"></i>
+              <span class="text-slate-300 text-sm">Infringing on intellectual property rights</span>
+            </div>
+            <div class="flex items-start gap-3 bg-navy-900/60 border border-gold-500/10 rounded px-4 py-3">
+              <i class="fa-solid fa-xmark text-gold-500/60 mt-0.5 flex-shrink-0 text-sm"></i>
+              <span class="text-slate-300 text-sm">Harassment, abuse, or discrimination of any kind</span>
+            </div>
+            <div class="flex items-start gap-3 bg-navy-900/60 border border-gold-500/10 rounded px-4 py-3">
+              <i class="fa-solid fa-xmark text-gold-500/60 mt-0.5 flex-shrink-0 text-sm"></i>
+              <span class="text-slate-300 text-sm">Submitting false or misleading information</span>
+            </div>
+            <div class="flex items-start gap-3 bg-navy-900/60 border border-gold-500/10 rounded px-4 py-3">
+              <i class="fa-solid fa-xmark text-gold-500/60 mt-0.5 flex-shrink-0 text-sm"></i>
+              <span class="text-slate-300 text-sm">Uploading viruses or malicious code of any kind</span>
+            </div>
+            <div class="flex items-start gap-3 bg-navy-900/60 border border-gold-500/10 rounded px-4 py-3">
+              <i class="fa-solid fa-xmark text-gold-500/60 mt-0.5 flex-shrink-0 text-sm"></i>
+              <span class="text-slate-300 text-sm">Collecting personal information of others</span>
+            </div>
+            <div class="flex items-start gap-3 bg-navy-900/60 border border-gold-500/10 rounded px-4 py-3">
+              <i class="fa-solid fa-xmark text-gold-500/60 mt-0.5 flex-shrink-0 text-sm"></i>
+              <span class="text-slate-300 text-sm">Interfering with security features of the Service</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 13 -->
+        <div id="s13" class="policy-section px-6 py-7 reveal">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 bg-navy-700 border border-gold-500/25 rounded flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-shield-halved text-gold-400 text-sm"></i>
+            </div>
+            <div>
+              <span class="coord-text text-[0.6rem]">SECTION 13</span>
+              <h3 class="font-display font-bold text-white text-xl leading-tight">Disclaimer of Warranties; Limitation of Liability</h3>
+            </div>
+          </div>
+          <p class="text-slate-300 leading-relaxed mb-4">
+            We do not guarantee that your use of our service will be uninterrupted, timely, secure, or error-free. The service and all products delivered to you are provided "as is" and "as available" for your use, without any representation, warranties, or conditions of any kind.
+          </p>
+          <div class="note-box p-4">
+            <div class="flex items-start gap-3">
+              <i class="fa-solid fa-triangle-exclamation text-gold-400 mt-0.5 flex-shrink-0 text-sm"></i>
+              <p class="text-slate-400 text-sm leading-relaxed">
+                In no case shall Shellback Marines, our directors, officers, employees, affiliates, agents, contractors, suppliers, or licensors be liable for any injury, loss, claim, or any direct, indirect, incidental, punitive, special, or consequential damages of any kind, arising from your use of any of the service or any products procured using the service.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 14 -->
+        <div id="s14" class="policy-section px-6 py-7 reveal">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 bg-navy-700 border border-gold-500/25 rounded flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-handshake text-gold-400 text-sm"></i>
+            </div>
+            <div>
+              <span class="coord-text text-[0.6rem]">SECTION 14</span>
+              <h3 class="font-display font-bold text-white text-xl leading-tight">Indemnification</h3>
+            </div>
+          </div>
+          <p class="text-slate-300 leading-relaxed">
+            You agree to indemnify, defend, and hold harmless Shellback Marines and our parent, subsidiaries, affiliates, partners, officers, directors, agents, contractors, licensors, service providers, subcontractors, suppliers, interns, and employees from any claim or demand — including reasonable attorneys' fees — made by any third party due to or arising out of your breach of these Terms of Service or your violation of any law or the rights of a third party.
+          </p>
+        </div>
+
+        <!-- SECTION 15 -->
+        <div id="s15" class="policy-section px-6 py-7 reveal">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 bg-navy-700 border border-gold-500/25 rounded flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-puzzle-piece text-gold-400 text-sm"></i>
+            </div>
+            <div>
+              <span class="coord-text text-[0.6rem]">SECTION 15</span>
+              <h3 class="font-display font-bold text-white text-xl leading-tight">Severability</h3>
+            </div>
+          </div>
+          <p class="text-slate-300 leading-relaxed">
+            In the event that any provision of these Terms of Service is determined to be unlawful, void, or unenforceable, such provision shall nonetheless be enforceable to the fullest extent permitted by applicable law. The unenforceable portion shall be deemed severed from these Terms, and such determination shall not affect the validity and enforceability of any other remaining provisions.
+          </p>
+        </div>
+
+        <!-- SECTION 16 -->
+        <div id="s16" class="policy-section px-6 py-7 reveal">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 bg-navy-700 border border-gold-500/25 rounded flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-power-off text-gold-400 text-sm"></i>
+            </div>
+            <div>
+              <span class="coord-text text-[0.6rem]">SECTION 16</span>
+              <h3 class="font-display font-bold text-white text-xl leading-tight">Termination</h3>
+            </div>
+          </div>
+          <p class="text-slate-300 leading-relaxed mb-4">
+            The obligations and liabilities of the parties incurred prior to the termination date shall survive the termination of this agreement for all purposes. These Terms of Service are effective unless and until terminated by either you or us.
+          </p>
+          <p class="text-slate-300 leading-relaxed">
+            If in our sole judgment you fail — or we suspect that you have failed — to comply with any term of these Terms of Service, we may terminate this agreement at any time without notice. You will remain liable for all amounts due up to and including the date of termination.
+          </p>
+        </div>
+
+        <!-- SECTION 17 -->
+        <div id="s17" class="policy-section px-6 py-7 reveal">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 bg-navy-700 border border-gold-500/25 rounded flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-file-contract text-gold-400 text-sm"></i>
+            </div>
+            <div>
+              <span class="coord-text text-[0.6rem]">SECTION 17</span>
+              <h3 class="font-display font-bold text-white text-xl leading-tight">Entire Agreement</h3>
+            </div>
+          </div>
+          <p class="text-slate-300 leading-relaxed">
+            The failure of us to exercise or enforce any right or provision of these Terms shall not constitute a waiver of such right or provision. These Terms of Service and any policies or operating rules posted by us on this site constitute the entire agreement and understanding between you and us, and govern your use of the Service — superseding any prior or contemporaneous agreements, communications, and proposals, whether oral or written.
+          </p>
+        </div>
+
+        <!-- SECTION 18 -->
+        <div id="s18" class="policy-section px-6 py-7 reveal">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 bg-navy-700 border border-gold-500/25 rounded flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-landmark text-gold-400 text-sm"></i>
+            </div>
+            <div>
+              <span class="coord-text text-[0.6rem]">SECTION 18</span>
+              <h3 class="font-display font-bold text-white text-xl leading-tight">Governing Law</h3>
+            </div>
+          </div>
+          <p class="text-slate-300 leading-relaxed">
+            These Terms of Service and any separate agreements whereby we provide you services shall be governed by and construed in accordance with the <span class="text-gold-300 font-medium">laws of India</span>.
+          </p>
+        </div>
+
+        <!-- SECTION 19 -->
+        <div id="s19" class="policy-section px-6 py-7 reveal">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 bg-navy-700 border border-gold-500/25 rounded flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-pen-to-square text-gold-400 text-sm"></i>
+            </div>
+            <div>
+              <span class="coord-text text-[0.6rem]">SECTION 19</span>
+              <h3 class="font-display font-bold text-white text-xl leading-tight">Changes to Terms of Service</h3>
+            </div>
+          </div>
+          <p class="text-slate-300 leading-relaxed">
+            You can review the most current version of the Terms of Service at any time on this page. We reserve the right, at our sole discretion, to update, change, or replace any part of these Terms by posting updates and changes to our website. It is your responsibility to check our website periodically for changes. Your continued use of our website or the Service following the posting of any changes constitutes acceptance of those changes.
+          </p>
+        </div>
+
+        <!-- SECTION 20 — Contact -->
+        <div id="s20" class="policy-section px-6 py-7 reveal">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 bg-navy-700 border border-gold-500/25 rounded flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-envelope text-gold-400 text-sm"></i>
+            </div>
+            <div>
+              <span class="coord-text text-[0.6rem]">SECTION 20</span>
+              <h3 class="font-display font-bold text-white text-xl leading-tight">Contact Information</h3>
+            </div>
+          </div>
+          <p class="text-slate-300 leading-relaxed mb-6">
+            Questions about the Terms of Service should be sent to us at:
+          </p>
+          <div class="grid sm:grid-cols-2 gap-4">
+            <a href="mailto:abhisek@shellbackmarines.com"
+               class="flex items-start gap-4 bg-navy-900/70 border border-gold-500/15 hover:border-gold-400/40 rounded p-4 transition-all group">
+              <div class="w-10 h-10 bg-gold-500/10 border border-gold-500/20 rounded flex items-center justify-center flex-shrink-0 group-hover:bg-gold-500/20 transition-colors">
+                <i class="fa-solid fa-envelope text-gold-400 text-sm"></i>
+              </div>
+              <div>
+                <div class="text-slate-500 text-xs font-condensed uppercase tracking-wider mb-1">Email</div>
+                <div class="text-gold-300 group-hover:text-gold-200 text-sm transition-colors break-all">abhisek@shellbackmarines.com</div>
+              </div>
+            </a>
+            <div class="flex items-start gap-4 bg-navy-900/70 border border-gold-500/15 rounded p-4">
+              <div class="w-10 h-10 bg-gold-500/10 border border-gold-500/20 rounded flex items-center justify-center flex-shrink-0">
+                <i class="fa-solid fa-location-dot text-gold-400 text-sm"></i>
+              </div>
+              <div>
+                <div class="text-slate-500 text-xs font-condensed uppercase tracking-wider mb-1">Address</div>
+                <address class="text-slate-300 not-italic text-sm leading-relaxed">
+                  Shellback Marines<br/>
+                  Oodlabari Bidhanpally PO Manabari<br/>
+                  Dist Jalpaiguri, WB 735222
+                </address>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /policy sections -->
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     CTA BANNER
+══════════════════════════════════════════ -->
+<section class="relative py-20 overflow-hidden">
+  <div class="absolute inset-0">
+    <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1800&q=80" alt="Ocean" class="w-full h-full object-cover opacity-15" />
+    <div class="absolute inset-0 bg-gradient-to-r from-navy-950 via-navy-900/90 to-navy-950"></div>
+  </div>
+  <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center reveal">
+    <div class="w-16 h-16 bg-gold-500/10 border border-gold-500/30 rounded-full flex items-center justify-center mx-auto mb-6">
+      <i class="fa-solid fa-map text-gold-400 text-2xl"></i>
+    </div>
+    <h2 class="font-display font-bold text-white text-3xl lg:text-5xl mb-5 leading-tight">
+      Ready to Navigate with <span class="text-gold-400">Confidence?</span>
+    </h2>
+    <p class="text-slate-400 text-lg mb-10 max-w-xl mx-auto leading-relaxed">
+      Browse our full catalogue of nautical charts, hydrographic publications, and navigational instruments — all in one place.
+    </p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+      <a href="products.html" class="bg-gold-500 hover:bg-gold-400 text-navy-950 font-condensed font-bold uppercase tracking-wider px-10 py-4 transition-all hover:scale-105 rounded-sm text-sm">
+        <i class="fa-solid fa-store mr-2"></i>Browse Our Catalogue
+      </a>
+      <a href="contact.html" class="border border-gold-500/50 hover:border-gold-400 text-gold-300 font-condensed font-bold uppercase tracking-wider px-10 py-4 transition-all hover:bg-gold-500/10 rounded-sm text-sm">
+        <i class="fa-solid fa-envelope mr-2"></i>Contact Us
+      </a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════ -->
+<footer class="bg-navy-950 border-t border-gold-500/15">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-10">
+
+      <div class="lg:col-span-1">
+        <div class="flex items-center gap-3 mb-5">
+          <img src="./img/logo.png" alt="Shellback Marines Logo" class="w-10 h-10 rounded-full object-contain border-2 border-gold-500 bg-navy-800" />
+          <div>
+            <div class="font-display font-bold text-white text-base">Shellback Marines</div>
+            <div class="coord-text">SINCE 2023</div>
+          </div>
+        </div>
+        <p class="text-slate-400 text-sm leading-relaxed mb-5">
+          Premier source for hydrographic products and nautical charts. Serving mariners, naval forces, and maritime professionals across India.
+        </p>
+        <div class="flex gap-3">
+          <a href="#" class="w-9 h-9 bg-navy-800 border border-gold-500/20 hover:border-gold-400 rounded flex items-center justify-center text-slate-400 hover:text-gold-300 transition-all"><i class="fa-brands fa-facebook-f text-sm"></i></a>
+          <a href="#" class="w-9 h-9 bg-navy-800 border border-gold-500/20 hover:border-gold-400 rounded flex items-center justify-center text-slate-400 hover:text-gold-300 transition-all"><i class="fa-brands fa-instagram text-sm"></i></a>
+          <a href="#" class="w-9 h-9 bg-navy-800 border border-gold-500/20 hover:border-gold-400 rounded flex items-center justify-center text-slate-400 hover:text-gold-300 transition-all"><i class="fa-brands fa-linkedin-in text-sm"></i></a>
+          <a href="https://wa.me/919742172874" class="w-9 h-9 bg-navy-800 border border-gold-500/20 hover:border-gold-400 rounded flex items-center justify-center text-slate-400 hover:text-gold-300 transition-all"><i class="fa-brands fa-whatsapp text-sm"></i></a>
+        </div>
+      </div>
+
+      <div>
+        <h4 class="font-condensed font-bold text-white uppercase tracking-wider text-sm mb-5">Quick Links</h4>
+        <ul class="space-y-2.5">
+          <li><a href="index.html"                   class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-gold-500/50 text-xs"></i>Home</a></li>
+          <li><a href="about.html"                   class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-gold-500/50 text-xs"></i>About Us</a></li>
+          <li><a href="products.html"                class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-gold-500/50 text-xs"></i>Products</a></li>
+          <li><a href="contact.html"                 class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-gold-500/50 text-xs"></i>Contact Us</a></li>
+          <li><a href="privacy-policy.html"          class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-gold-500/50 text-xs"></i>Privacy Policy</a></li>
+          <li><a href="shipping-return-policy.html"  class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-gold-500/50 text-xs"></i>Shipping &amp; Returns</a></li>
+          <li><a href="terms-and-conditions.html"    class="text-gold-300 text-sm flex items-center gap-2"><i class="fa-solid fa-chevron-right text-gold-500/50 text-xs"></i>Terms &amp; Conditions</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="font-condensed font-bold text-white uppercase tracking-wider text-sm mb-5">Categories</h4>
+        <ul class="space-y-2.5">
+          <li><a href="products.html" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-map text-gold-500/50 text-xs"></i>Paper Charts</a></li>
+          <li><a href="products.html" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-book text-gold-500/50 text-xs"></i>Nautical Publications</a></li>
+          <li><a href="products.html" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-compass text-gold-500/50 text-xs"></i>Navigational Instruments</a></li>
+          <li><a href="products.html" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chart-area text-gold-500/50 text-xs"></i>Hydrographic Reports</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="font-condensed font-bold text-white uppercase tracking-wider text-sm mb-5">Contact</h4>
+        <ul class="space-y-4">
+          <li class="flex items-start gap-3">
+            <i class="fa-solid fa-phone text-gold-400 mt-0.5 flex-shrink-0 text-sm"></i>
+            <a href="tel:+919742172874" class="text-slate-400 hover:text-gold-300 text-sm transition-colors">+91-97421 72874</a>
+          </li>
+          <li class="flex items-start gap-3">
+            <i class="fa-solid fa-envelope text-gold-400 mt-0.5 flex-shrink-0 text-sm"></i>
+            <a href="mailto:abhisek@shellbackmarines.com" class="text-slate-400 hover:text-gold-300 text-sm transition-colors break-all">abhisek@shellbackmarines.com</a>
+          </li>
+          <li class="flex items-start gap-3">
+            <i class="fa-solid fa-location-dot text-gold-400 mt-0.5 flex-shrink-0 text-sm"></i>
+            <address class="text-slate-400 not-italic text-sm leading-relaxed">Oodlabari Bidhanpally PO Manabari, Dist Jalpaiguri, WB 735222</address>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="border-t border-white/5 mt-12 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p class="text-slate-500 text-sm">© 2025 Shellback Marines. All rights reserved.</p>
+      <p class="text-slate-600 text-xs font-condensed uppercase tracking-wider">Guardians of the Nation · Warriors of the Seas</p>
+    </div>
+  </div>
+</footer>
+
+<!-- WhatsApp -->
+<a href="https://wa.me/919742172874" target="_blank" rel="noopener noreferrer"
+   aria-label="Chat on WhatsApp"
+   style="position:fixed;bottom:84px;right:24px;z-index:41;width:48px;height:48px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(37,211,102,.4);transition:transform .2s ease,box-shadow .2s ease;text-decoration:none"
+   onmouseover="this.style.transform='scale(1.1)';this.style.boxShadow='0 6px 24px rgba(37,211,102,.6)'"
+   onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 4px 16px rgba(37,211,102,.4)'">
+  <i class="fa-brands fa-whatsapp" style="color:#fff;font-size:1.5rem;line-height:1"></i>
+</a>
+
+<!-- Scroll to Top -->
+<button id="scroll-top"
+  class="fixed bottom-6 right-6 w-12 h-12 bg-gold-500 hover:bg-gold-400 text-navy-950 rounded-full shadow-lg flex items-center justify-center opacity-0 translate-y-4 transition-all duration-300 z-40"
+  aria-label="Scroll to top">
+  <i class="fa-solid fa-chevron-up"></i>
+</button>
+
+
+<!-- ══════════════════════════════════════════
+     JS
+══════════════════════════════════════════ -->
+<script>
+  // Mobile menu
+  const menuBtn  = document.getElementById('menu-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const menuIcon = document.getElementById('menu-icon');
+  menuBtn.addEventListener('click', () => {
+    mobileMenu.classList.toggle('open');
+    menuIcon.className = mobileMenu.classList.contains('open') ? 'fa-solid fa-xmark' : 'fa-solid fa-bars';
+  });
+  mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    mobileMenu.classList.remove('open');
+    menuIcon.className = 'fa-solid fa-bars';
+  }));
+
+  // Scroll reveal
+  const revealEls = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+  const ro = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); ro.unobserve(e.target); } });
+  }, { threshold: 0.08 });
+  revealEls.forEach(el => ro.observe(el));
+
+  // Scroll-to-top
+  const scrollTopBtn = document.getElementById('scroll-top');
+  window.addEventListener('scroll', () => {
+    const show = window.scrollY > 400;
+    scrollTopBtn.style.opacity = show ? '1' : '0';
+    scrollTopBtn.style.transform = show ? 'translateY(0)' : 'translateY(1rem)';
+  });
+  scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+  // Navbar compact
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => navbar.classList.toggle('py-0', window.scrollY > 60));
+
+  // Smooth ToC scroll
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) window.scrollTo({ top: target.getBoundingClientRect().top + window.pageYOffset - 100, behavior: 'smooth' });
+    });
+  });
+</script>
+</body>
+</html>
