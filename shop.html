@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/png" href="favicon.png" />
+  <link rel="icon" type="image/png" href="./img/logo.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Shop – Shellback Marines</title>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -102,6 +102,24 @@
 
     /* Grid / List toggle */
     .view-active{color:#c8922a!important}
+
+    /* View button */
+    .btn-view{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;padding:7px 10px;background:transparent;color:#c8922a;border:1px solid rgba(200,146,42,.45);border-radius:2px;cursor:pointer;transition:all .2s ease;white-space:nowrap}
+    .btn-view:hover{background:rgba(200,146,42,.12);border-color:#c8922a}
+
+    /* Product popup */
+    #product-popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;opacity:0;pointer-events:none;transition:opacity .25s ease;display:flex;align-items:center;justify-content:center;padding:20px}
+    #product-popup-overlay.open{opacity:1;pointer-events:all}
+    #product-popup{background:#041424;border:1px solid rgba(200,146,42,.3);border-radius:4px;width:100%;max-width:440px;padding:28px;position:relative;transform:translateY(20px) scale(.97);transition:transform .25s ease;box-shadow:0 24px 60px rgba(0,0,0,.7)}
+    #product-popup-overlay.open #product-popup{transform:translateY(0) scale(1)}
+    #popup-close{position:absolute;top:12px;right:14px;background:none;border:none;color:#94a3b8;cursor:pointer;font-size:1.1rem;transition:color .2s ease}
+    #popup-close:hover{color:#c8922a}
+    .popup-map-label{font-family:'Barlow Condensed',sans-serif;font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(200,146,42,.6);margin-bottom:6px}
+    .popup-title{font-family:'Playfair Display',serif;font-weight:700;color:#fff;font-size:1.15rem;line-height:1.35;margin-bottom:16px}
+    .popup-desc-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:7px;font-family:'Barlow',sans-serif;font-size:.82rem;color:#94a3b8}
+    .popup-desc-row strong{color:#c8922a;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;min-width:64px}
+    .popup-price{font-family:'Playfair Display',serif;font-weight:700;color:#d4a843;font-size:1.5rem;margin:18px 0 16px}
+    .popup-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(200,146,42,.25),transparent);margin:14px 0}
   </style>
 </head>
 <body>
@@ -406,18 +424,26 @@
   <i class="fa-solid fa-chevron-up"></i>
 </button>
 
-    <button id="cart-close" class="text-slate-400 hover:text-gold-300 transition-colors p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
-  </div>
-  <div id="cart-items" class="flex-1 overflow-y-auto px-5 py-4 space-y-3"></div>
-  <div class="flex-shrink-0 border-t border-gold-500/20 px-5 py-4 space-y-4">
-    <div class="flex justify-between items-center">
-      <span class="font-condensed text-slate-300 uppercase tracking-wider text-sm">Total</span>
-      <span id="cart-total" class="font-display font-bold text-gold-300 text-xl">₹0</span>
+<!-- ════ PRODUCT POPUP ════ -->
+<div id="product-popup-overlay">
+  <div id="product-popup">
+    <button id="popup-close" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+    <div style="display:flex;gap:16px;align-items:flex-start;margin-bottom:16px">
+      <img id="popup-img" src="" alt="" style="width:90px;height:90px;object-fit:cover;border-radius:3px;border:1px solid rgba(200,146,42,.2);flex-shrink:0;background:#072238"/>
+      <div style="flex:1;min-width:0">
+        <div class="popup-map-label"><i class="fa-solid fa-map mr-1 text-[10px]"></i>Nautical Chart</div>
+        <div class="popup-title" id="popup-name"></div>
+      </div>
     </div>
-    <button id="checkout-btn" class="w-full bg-gold-500 hover:bg-gold-400 text-navy-950 font-condensed font-bold uppercase tracking-wider text-sm py-3 rounded-sm transition-colors">
-      <i class="fa-solid fa-lock mr-2"></i>Proceed to Checkout
+    <div class="popup-divider"></div>
+    <div id="popup-desc"></div>
+    <div class="popup-price" id="popup-price"></div>
+    <button class="btn-cart" id="popup-cart-btn" style="width:100%;padding:10px 16px;font-size:.82rem;display:flex;align-items:center;justify-content:center;gap:8px">
+      <i class="fa-solid fa-cart-plus text-xs"></i><span>Add to Cart</span>
     </button>
-    <p class="text-slate-500 text-xs text-center">Shipping calculated at checkout</p>
+    <button onclick="closeProductPopup()" style="width:100%;margin-top:10px;padding:8px 16px;background:transparent;border:1px solid rgba(148,163,184,.25);border-radius:2px;color:#94a3b8;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .2s ease" onmouseover="this.style.borderColor='rgba(200,146,42,.4)';this.style.color='#c8922a'" onmouseout="this.style.borderColor='rgba(148,163,184,.25)';this.style.color='#94a3b8'">
+      <i class="fa-solid fa-xmark mr-1 text-xs"></i>Close
+    </button>
   </div>
 </div>
 
@@ -547,6 +573,7 @@ function renderProducts() {
         </div>
         <div class="flex items-center gap-3 flex-shrink-0">
           <span class="font-display font-bold text-gold-300 text-base">₹${p.price.toLocaleString('en-IN')}</span>
+          <button class="btn-view" onclick="openProductPopup(${p.id})"><i class="fa-solid fa-eye mr-1 text-xs"></i>View</button>
           <button class="btn-cart ${inCart?'added':''}" onclick="addToCart(${p.id},this)">
             <i class="fa-solid ${inCart?'fa-check':'fa-cart-plus'} mr-1 text-xs"></i>${inCart?'Added':'Add'}
           </button>
@@ -567,9 +594,12 @@ function renderProducts() {
         </p>
         <div class="flex items-center justify-between mt-auto pt-2 border-t border-gold-500/10">
           <span class="font-display font-bold text-gold-300 text-lg">₹${p.price.toLocaleString('en-IN')}</span>
-          <button class="btn-cart ${inCart?'added':''}" onclick="addToCart(${p.id},this)">
-            <i class="fa-solid ${inCart?'fa-check':'fa-cart-plus'} mr-1 text-xs"></i>${inCart?'Added':'Add to Cart'}
-          </button>
+          <div class="flex items-center gap-2">
+            <button class="btn-view" onclick="openProductPopup(${p.id})"><i class="fa-solid fa-eye mr-1 text-xs"></i>View</button>
+            <button class="btn-cart ${inCart?'added':''}" onclick="addToCart(${p.id},this)">
+              <i class="fa-solid ${inCart?'fa-check':'fa-cart-plus'} mr-1 text-xs"></i>${inCart?'Added':'Add'}
+            </button>
+          </div>
         </div>
       </div>
     </div>`;
@@ -680,6 +710,60 @@ scrollTopBtn.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smoot
 const revealEls=document.querySelectorAll('.reveal');
 const revealObserver=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');revealObserver.unobserve(e.target);}}),{threshold:.08});
 revealEls.forEach(el=>revealObserver.observe(el));
+
+// ── Product Popup ──
+function openProductPopup(id) {
+  const p = ALL_PRODUCTS.find(x => x.id === id);
+  if (!p) return;
+
+  const imgUrl = p.folio === 'publications' ? './img/publication.jpg' : './img/folio.jpeg';
+  document.getElementById('popup-img').src = imgUrl;
+  document.getElementById('popup-img').alt = p.name;
+  document.getElementById('popup-name').textContent = p.name;
+  document.getElementById('popup-price').textContent = '₹' + p.price.toLocaleString('en-IN');
+
+  // Build description rows
+  const rows = [];
+  if (p.folio) {
+    const folioNames = {folio1:'Folio 1 — Indian Ocean',folio2:'Folio 2 — Gujarat',folio3:'Folio 3 — West Coast',folio4:'Folio 4 — Kerala',folio5:'Folio 5 — East Coast',folio6:'Folio 6 — Andaman',publications:'Publication',other:'Paper Chart'};
+    rows.push({label:'Category', val: folioNames[p.folio] || p.folio});
+  }
+  if (p.chart_no) rows.push({label:'Chart No.', val: p.chart_no});
+  if (p.edition)  rows.push({label:'Edition',  val: p.edition});
+  if (p.scale)    rows.push({label:'Scale',     val: p.scale});
+
+  document.getElementById('popup-desc').innerHTML = rows.map(r =>
+    `<div class="popup-desc-row"><strong>${r.label}</strong><span>${esc(r.val)}</span></div>`
+  ).join('');
+
+  // Update add-to-cart button
+  const inCart = state.cart.some(c => c.id === id);
+  const btn = document.getElementById('popup-cart-btn');
+  btn.className = 'btn-cart' + (inCart ? ' added' : '');
+  btn.style.cssText = 'width:100%;padding:10px 16px;font-size:.82rem;display:flex;align-items:center;justify-content:center;gap:8px';
+  btn.innerHTML = `<i class="fa-solid ${inCart ? 'fa-check' : 'fa-cart-plus'} text-xs"></i><span>${inCart ? 'Added to Cart' : 'Add to Cart'}</span>`;
+  btn.onclick = function() {
+    addToCart(id, null);
+    btn.className = 'btn-cart added';
+    btn.innerHTML = '<i class="fa-solid fa-check text-xs"></i><span>Added to Cart</span>';
+  };
+
+  document.getElementById('product-popup-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeProductPopup() {
+  document.getElementById('product-popup-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('popup-close').addEventListener('click', closeProductPopup);
+document.getElementById('product-popup-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeProductPopup();
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeProductPopup();
+});
 
 // ── Init ──
 updateCounts();
