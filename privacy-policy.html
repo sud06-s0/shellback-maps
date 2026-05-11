@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="./img/logo.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy – Shellback Marines</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: {
+              950: '#020b18',
+              900: '#041424',
+              800: '#072238',
+              700: '#0c3454',
+              600: '#114a76',
+              500: '#155f98',
+            },
+            ocean: {
+              500: '#0e7490',
+              400: '#0891b2',
+              300: '#22d3ee',
+              200: '#a5f3fc',
+            },
+            gold: {
+              500: '#c8922a',
+              400: '#d4a843',
+              300: '#e8c76a',
+              200: '#fde68a',
+            },
+          },
+          fontFamily: {
+            display: ['Playfair Display', 'serif'],
+            body: ['Barlow', 'sans-serif'],
+            condensed: ['Barlow Condensed', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Barlow', sans-serif; background: #020b18; color: #e2e8f0; overflow-x: hidden; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #041424; }
+    ::-webkit-scrollbar-thumb { background: #c8922a; border-radius: 3px; }
+
+    .map-grid {
+      background-image:
+        linear-gradient(rgba(200,146,42,0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(200,146,42,0.07) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    .page-hero {
+      background-image:
+        linear-gradient(to bottom, rgba(2,11,24,0.5) 0%, rgba(2,11,24,0.72) 60%, rgba(2,11,24,1) 100%),
+        url('https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1800&q=80');
+      background-size: cover;
+      background-position: center;
+    }
+
+    .glass-nav {
+      backdrop-filter: blur(16px) saturate(160%);
+      -webkit-backdrop-filter: blur(16px) saturate(160%);
+      background: rgba(2,11,24,0.78);
+      border-bottom: 1px solid rgba(200,146,42,0.18);
+    }
+
+    .gold-divider {
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #c8922a, transparent);
+    }
+    .gold-divider-left {
+      height: 2px;
+      background: linear-gradient(90deg, #c8922a, transparent);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(32px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes spin-slow { to { transform: rotate(360deg); } }
+    .compass-spin { animation: spin-slow 30s linear infinite; }
+    .fade-up  { animation: fadeUp 0.9s ease both; }
+    .delay-1  { animation-delay: 0.15s; }
+    .delay-2  { animation-delay: 0.35s; }
+    .delay-3  { animation-delay: 0.55s; }
+
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-left { opacity: 0; transform: translateX(-30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal-left.visible { opacity: 1; transform: translateX(0); }
+    .reveal-right { opacity: 0; transform: translateX(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal-right.visible { opacity: 1; transform: translateX(0); }
+
+    .nav-link { position: relative; }
+    .nav-link::after {
+      content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 1px;
+      background: #c8922a; transition: width 0.3s ease;
+    }
+    .nav-link:hover::after { width: 100%; }
+    .nav-link.active-page::after { width: 100%; }
+
+    .coord-text {
+      font-family: 'Barlow Condensed', sans-serif;
+      letter-spacing: 0.15em;
+      color: rgba(200,146,42,0.5);
+      font-size: 0.65rem;
+    }
+
+    #mobile-menu { transition: max-height 0.4s ease, opacity 0.4s ease; max-height: 0; opacity: 0; overflow: hidden; }
+    #mobile-menu.open { max-height: 500px; opacity: 1; }
+
+    /* Policy section card */
+    .policy-section {
+      border-left: 3px solid rgba(200,146,42,0.35);
+      background: linear-gradient(135deg, rgba(7,34,56,0.6), rgba(4,20,36,0.8));
+      border-radius: 0 4px 4px 0;
+      transition: border-color 0.3s ease;
+    }
+    .policy-section:hover {
+      border-color: #c8922a;
+    }
+
+    /* Table of contents item */
+    .toc-item {
+      transition: color 0.2s ease, padding-left 0.2s ease;
+    }
+    .toc-item:hover {
+      color: #d4a843;
+      padding-left: 4px;
+    }
+  </style>
+</head>
+<body>
+
+
+<!-- ════════════════════════════════════════════
+     NAVBAR
+════════════════════════════════════════════ -->
+<header id="navbar" class="fixed top-0 left-0 right-0 z-50 glass-nav">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16 lg:h-20">
+
+      <!-- Logo -->
+      <a href="index.html" class="flex items-center gap-3 group">
+        <img src="./img/logo.png" alt="Shellback Marines Logo" class="w-10 h-10 lg:w-12 lg:h-12 rounded-full object-contain border-2 border-gold-500 group-hover:border-gold-300 transition-colors bg-navy-800" />
+        <div>
+          <div class="font-display font-bold text-white text-base lg:text-lg leading-tight">Shellback Marines</div>
+          <div class="coord-text hidden sm:block">HYDROGRAPHIC PRODUCTS & NAUTICAL CHARTS</div>
+        </div>
+      </a>
+
+      <!-- Desktop Nav -->
+      <nav class="hidden lg:flex items-center gap-8">
+        <a href="index.html" class="nav-link text-slate-300 hover:text-gold-300 font-body text-sm font-medium transition-colors">Home</a>
+        <a href="about.html" class="nav-link text-slate-300 hover:text-gold-300 font-body text-sm font-medium transition-colors">About Us</a>
+        <a href="products.html" class="nav-link text-slate-300 hover:text-gold-300 font-body text-sm font-medium transition-colors">Products</a>
+        <a href="index.html#why-us" class="nav-link text-slate-300 hover:text-gold-300 font-body text-sm font-medium transition-colors">Why Us</a>
+        <a href="contact.html" class="nav-link text-slate-300 hover:text-gold-300 font-body text-sm font-medium transition-colors">Contact</a>
+        <a href="shop.html" class="bg-gold-500 hover:bg-gold-400 text-navy-950 font-condensed font-bold text-sm px-5 py-2.5 uppercase tracking-wider transition-colors rounded-sm">
+          <i class="fa-solid fa-store mr-1.5"></i>Shop Now
+        </a>
+      </nav>
+
+      <!-- Mobile Toggle -->
+      <button id="menu-btn" class="lg:hidden text-gold-400 text-2xl p-2" aria-label="Toggle menu">
+        <i id="menu-icon" class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="lg:hidden bg-navy-900 border-t border-gold-500/20">
+    <div class="px-4 py-4 flex flex-col gap-1">
+      <a href="index.html" class="text-slate-300 hover:text-gold-300 py-2.5 border-b border-white/5 font-body">Home</a>
+      <a href="about.html" class="text-slate-300 hover:text-gold-300 py-2.5 border-b border-white/5 font-body">About Us</a>
+      <a href="products.html" class="text-slate-300 hover:text-gold-300 py-2.5 border-b border-white/5 font-body">Products</a>
+      <a href="index.html#why-us" class="text-slate-300 hover:text-gold-300 py-2.5 border-b border-white/5 font-body">Why Us</a>
+      <a href="contact.html" class="text-slate-300 hover:text-gold-300 py-2.5 border-b border-white/5 font-body">Contact</a>
+      <a href="shop.html" class="mt-3 bg-gold-500 text-navy-950 font-condensed font-bold text-sm px-5 py-3 uppercase tracking-wider text-center rounded-sm">
+        <i class="fa-solid fa-store mr-1.5"></i>Shop Now
+      </a>
+    </div>
+  </div>
+</header>
+
+
+<!-- ════════════════════════════════════════════
+     PAGE HERO BANNER
+════════════════════════════════════════════ -->
+<section class="relative page-hero map-grid pt-32 pb-24 lg:pt-44 lg:pb-32 flex items-center">
+  <!-- Spinning Compass -->
+  <div class="absolute top-20 right-8 opacity-10 compass-spin" aria-hidden="true">
+    <i class="fa-solid fa-compass text-gold-400 text-8xl lg:text-9xl"></i>
+  </div>
+  <div class="absolute bottom-10 left-6 coord-text">N 22°34.8′ / E 88°21.6′ — JALPAIGURI, WB</div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+    <!-- Breadcrumb -->
+    <nav class="flex items-center gap-2 text-xs font-condensed uppercase tracking-wider text-slate-500 mb-6 fade-up">
+      <a href="index.html" class="hover:text-gold-400 transition-colors">Home</a>
+      <i class="fa-solid fa-chevron-right text-gold-500/40 text-[10px]"></i>
+      <span class="text-gold-400">Privacy Policy</span>
+    </nav>
+
+    <div class="max-w-2xl">
+      <div class="flex items-center gap-3 mb-5 fade-up">
+        <div class="h-px w-10 bg-gold-500"></div>
+        <span class="coord-text text-gold-400 tracking-widest text-xs uppercase font-condensed">Legal & Compliance</span>
+      </div>
+      <h1 class="font-display font-black text-white text-4xl lg:text-6xl leading-tight mb-5 fade-up delay-1">
+        Privacy <span class="text-gold-400">Policy</span>
+      </h1>
+      <p class="text-slate-300 text-lg leading-relaxed fade-up delay-2">
+        How we collect, use, and safeguard your personal information when you visit or purchase from shellbackmarines.com.
+      </p>
+      <div class="flex items-center gap-3 mt-6 fade-up delay-3">
+        <i class="fa-solid fa-calendar-check text-gold-500/60 text-sm"></i>
+        <span class="text-slate-500 text-sm font-condensed uppercase tracking-wider">Last Updated: 2023</span>
+      </div>
+    </div>
+  </div>
+  <div class="absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-t from-navy-950 to-transparent pointer-events-none"></div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     MAIN POLICY CONTENT
+════════════════════════════════════════════ -->
+<section class="bg-navy-950 py-20 lg:py-28">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid lg:grid-cols-3 gap-12 items-start">
+
+      <!-- ── Sticky Table of Contents (desktop) ── -->
+      <aside class="lg:col-span-1 reveal-left lg:sticky lg:top-28">
+        <div class="bg-navy-800 border border-gold-500/20 rounded p-6">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-8 h-8 bg-gold-500/10 border border-gold-500/30 rounded flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-list text-gold-400 text-xs"></i>
+            </div>
+            <h2 class="font-condensed font-bold text-white uppercase tracking-wider text-sm">Contents</h2>
+          </div>
+          <div class="gold-divider-left w-full mb-5"></div>
+          <nav>
+            <ol class="space-y-3">
+              <li>
+                <a href="#personal-info" class="toc-item flex items-start gap-2.5 text-slate-400 hover:text-gold-300 text-sm">
+                  <span class="text-gold-500/60 font-condensed text-xs mt-0.5 flex-shrink-0">01</span>
+                  Personal Information We Collect
+                </a>
+              </li>
+              <li>
+                <a href="#how-we-use" class="toc-item flex items-start gap-2.5 text-slate-400 hover:text-gold-300 text-sm">
+                  <span class="text-gold-500/60 font-condensed text-xs mt-0.5 flex-shrink-0">02</span>
+                  How Do We Use Your Information?
+                </a>
+              </li>
+              <li>
+                <a href="#sharing" class="toc-item flex items-start gap-2.5 text-slate-400 hover:text-gold-300 text-sm">
+                  <span class="text-gold-500/60 font-condensed text-xs mt-0.5 flex-shrink-0">03</span>
+                  Sharing Your Personal Information
+                </a>
+              </li>
+              <li>
+                <a href="#advertising" class="toc-item flex items-start gap-2.5 text-slate-400 hover:text-gold-300 text-sm">
+                  <span class="text-gold-500/60 font-condensed text-xs mt-0.5 flex-shrink-0">04</span>
+                  Behavioural Advertising
+                </a>
+              </li>
+              <li>
+                <a href="#do-not-track" class="toc-item flex items-start gap-2.5 text-slate-400 hover:text-gold-300 text-sm">
+                  <span class="text-gold-500/60 font-condensed text-xs mt-0.5 flex-shrink-0">05</span>
+                  Do Not Track
+                </a>
+              </li>
+              <li>
+                <a href="#data-retention" class="toc-item flex items-start gap-2.5 text-slate-400 hover:text-gold-300 text-sm">
+                  <span class="text-gold-500/60 font-condensed text-xs mt-0.5 flex-shrink-0">06</span>
+                  Data Retention
+                </a>
+              </li>
+              <li>
+                <a href="#changes" class="toc-item flex items-start gap-2.5 text-slate-400 hover:text-gold-300 text-sm">
+                  <span class="text-gold-500/60 font-condensed text-xs mt-0.5 flex-shrink-0">07</span>
+                  Changes to This Policy
+                </a>
+              </li>
+              <li>
+                <a href="#contact" class="toc-item flex items-start gap-2.5 text-slate-400 hover:text-gold-300 text-sm">
+                  <span class="text-gold-500/60 font-condensed text-xs mt-0.5 flex-shrink-0">08</span>
+                  Contact Us
+                </a>
+              </li>
+            </ol>
+          </nav>
+
+          <!-- Quick contact card -->
+          <div class="mt-8 pt-6 border-t border-gold-500/10">
+            <p class="text-slate-500 text-xs font-condensed uppercase tracking-wider mb-3">Privacy Questions?</p>
+            <a href="mailto:abhisek@shellbackmarines.com" class="flex items-center gap-2 text-gold-300 hover:text-gold-200 text-sm transition-colors">
+              <i class="fa-solid fa-envelope text-gold-500/60 text-xs flex-shrink-0"></i>
+              abhisek@shellbackmarines.com
+            </a>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ── Policy Sections ── -->
+      <div class="lg:col-span-2 space-y-10 reveal-right">
+
+        <!-- Intro -->
+        <div class="mb-2">
+          <span class="font-condensed text-gold-400 uppercase tracking-widest text-sm">Your Data. Your Rights.</span>
+          <h2 class="font-display font-bold text-white text-3xl lg:text-4xl mt-3 mb-6 leading-tight">
+            How We Handle <span class="text-gold-400">Your Information</span>
+          </h2>
+          <div class="gold-divider-left w-16 mb-6"></div>
+          <p class="text-slate-300 leading-relaxed">
+            This Privacy Policy describes how your personal information is collected, used, and shared when you visit or make a purchase from <span class="text-gold-300 font-medium">shellbackmarines.com</span> (the "Site"). We are committed to protecting your privacy and handling your data with transparency and care.
+          </p>
+        </div>
+
+        <!-- Section 01 -->
+        <div id="personal-info" class="policy-section px-6 py-7 reveal">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 bg-navy-700 border border-gold-500/25 rounded flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-database text-gold-400 text-sm"></i>
+            </div>
+            <div>
+              <span class="coord-text text-[0.6rem]">SECTION 01</span>
+              <h3 class="font-display font-bold text-white text-xl leading-tight">Personal Information We Collect</h3>
+            </div>
+          </div>
+          <p class="text-slate-300 leading-relaxed mb-5">
+            When you visit the Site, we automatically collect certain information about your device, including information about your web browser, IP address, time zone, and some of the cookies that are installed on your device. Additionally, as you browse the Site, we collect information about the individual web pages or products that you view, what websites or search terms referred you to the Site, and information about how you interact with the Site. We refer to this automatically-collected information as <span class="text-gold-300 font-medium">"Device Information"</span>.
+          </p>
+
+          <p class="text-slate-400 text-sm font-condensed uppercase tracking-wider mb-3">We collect Device Information using the following technologies:</p>
+
+          <ul class="space-y-3 mb-6">
+            <li class="flex items-start gap-3 text-slate-300 text-sm leading-relaxed">
+              <i class="fa-solid fa-circle-check text-gold-400 mt-0.5 flex-shrink-0"></i>
+              <span><span class="text-gold-300 font-medium">Cookies</span> — Data files placed on your device or computer that often include an anonymous unique identifier.</span>
+            </li>
+            <li class="flex items-start gap-3 text-slate-300 text-sm leading-relaxed">
+              <i class="fa-solid fa-circle-check text-gold-400 mt-0.5 flex-shrink-0"></i>
+              <span><span class="text-gold-300 font-medium">Log files</span> — Track actions occurring on the Site and collect data including your IP address, browser type, Internet service provider, referring/exit pages, and date/time stamps.</span>
+            </li>
+            <li class="flex items-start gap-3 text-slate-300 text-sm leading-relaxed">
+              <i class="fa-solid fa-circle-check text-gold-400 mt-0.5 flex-shrink-0"></i>
+              <span><span class="text-gold-300 font-medium">Web beacons, tags, and pixels</span> — Electronic files used to record information about how you browse the Site.</span>
+            </li>
+          </ul>
+
+          <p class="text-slate-300 leading-relaxed mb-4">
+            Additionally, when you make a purchase or attempt to make a purchase through the Site, we collect certain information from you, including your name, billing address, shipping address, payment information (including credit card numbers), email address, and phone number. We refer to this information as <span class="text-gold-300 font-medium">"Order Information"</span>.
+          </p>
+
+          <div class="bg-navy-900/60 border border-gold-500/15 rounded p-4 mt-4">
+            <p class="text-slate-400 text-sm leading-relaxed">
+              <i class="fa-solid fa-info-circle text-gold-400 mr-2"></i>
+              When we talk about <span class="text-gold-300">"Personal Information"</span> in this Privacy Policy, we are referring to both Device Information and Order Information combined.
+            </p>
+          </div>
+        </div>
+
+        <!-- Section 02 -->
+        <div id="how-we-use" class="policy-section px-6 py-7 reveal">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 bg-navy-700 border border-gold-500/25 rounded flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-gears text-gold-400 text-sm"></i>
+            </div>
+            <div>
+              <span class="coord-text text-[0.6rem]">SECTION 02</span>
+              <h3 class="font-display font-bold text-white text-xl leading-tight">How Do We Use Your Personal Information?</h3>
+            </div>
+          </div>
+          <p class="text-slate-300 leading-relaxed mb-5">
+            We use the Order Information that we collect generally to fulfil any orders placed through the Site (including processing your payment information, arranging for shipping, and providing you with invoices and/or order confirmations).
+          </p>
+          <p class="text-slate-400 text-sm font-condensed uppercase tracking-wider mb-3">Additionally, we use Order Information to:</p>
+          <ul class="space-y-3 mb-6">
+            <li class="flex items-start gap-3 text-slate-300 text-sm">
+              <i class="fa-solid fa-chevron-right text-gold-500/50 mt-0.5 flex-shrink-0 text-xs"></i>
+              Communicate with you regarding your orders and account
+            </li>
+            <li class="flex items-start gap-3 text-slate-300 text-sm">
+              <i class="fa-solid fa-chevron-right text-gold-500/50 mt-0.5 flex-shrink-0 text-xs"></i>
+              Screen our orders for potential risk or fraud
+            </li>
+            <li class="flex items-start gap-3 text-slate-300 text-sm">
+              <i class="fa-solid fa-chevron-right text-gold-500/50 mt-0.5 flex-shrink-0 text-xs"></i>
+              When in line with the preferences you have shared with us, provide you with information or advertising relating to our products or services
+            </li>
+          </ul>
+          <p class="text-slate-300 leading-relaxed">
+            We use the Device Information that we collect to help us screen for potential risk and fraud (in particular, your IP address), and more generally to improve and optimize our Site — for example, by generating analytics about how our customers browse and interact with the Site, and to assess the success of our marketing and advertising campaigns.
+          </p>
+        </div>
+
+        <!-- Section 03 -->
+        <div id="sharing" class="policy-section px-6 py-7 reveal">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 bg-navy-700 border border-gold-500/25 rounded flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-share-nodes text-gold-400 text-sm"></i>
+            </div>
+            <div>
+              <span class="coord-text text-[0.6rem]">SECTION 03</span>
+              <h3 class="font-display font-bold text-white text-xl leading-tight">Sharing Your Personal Information</h3>
+            </div>
+          </div>
+          <p class="text-slate-300 leading-relaxed">
+            We may share your Personal Information to comply with applicable laws and regulations, to respond to a subpoena, search warrant, or other lawful request for information we receive, or to otherwise protect our rights.
+          </p>
+        </div>
+
+        <!-- Section 04 -->
+        <div id="advertising" class="policy-section px-6 py-7 reveal">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 bg-navy-700 border border-gold-500/25 rounded flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-bullhorn text-gold-400 text-sm"></i>
+            </div>
+            <div>
+              <span class="coord-text text-[0.6rem]">SECTION 04</span>
+              <h3 class="font-display font-bold text-white text-xl leading-tight">Behavioural Advertising</h3>
+            </div>
+          </div>
+          <p class="text-slate-300 leading-relaxed mb-4">
+            As described above, we use your Personal Information to provide you with targeted advertisements or marketing communications we believe may be of interest to you.
+          </p>
+          <p class="text-slate-400 leading-relaxed text-sm">
+            For more information about how targeted advertising works, you can visit the Network Advertising Initiative's ("NAI") educational page at
+            <a href="http://www.networkadvertising.org/understanding-online-advertising/how-does-it-work" target="_blank" rel="noopener noreferrer" class="text-gold-300 hover:text-gold-200 underline underline-offset-2 transition-colors">
+              networkadvertising.org
+            </a>.
+          </p>
+        </div>
+
+        <!-- Section 05 -->
+        <div id="do-not-track" class="policy-section px-6 py-7 reveal">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 bg-navy-700 border border-gold-500/25 rounded flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-ban text-gold-400 text-sm"></i>
+            </div>
+            <div>
+              <span class="coord-text text-[0.6rem]">SECTION 05</span>
+              <h3 class="font-display font-bold text-white text-xl leading-tight">Do Not Track</h3>
+            </div>
+          </div>
+          <p class="text-slate-300 leading-relaxed">
+            Please note that we do not alter our Site's data collection and use practices when we see a Do Not Track signal from your browser.
+          </p>
+        </div>
+
+        <!-- Section 06 -->
+        <div id="data-retention" class="policy-section px-6 py-7 reveal">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 bg-navy-700 border border-gold-500/25 rounded flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-clock-rotate-left text-gold-400 text-sm"></i>
+            </div>
+            <div>
+              <span class="coord-text text-[0.6rem]">SECTION 06</span>
+              <h3 class="font-display font-bold text-white text-xl leading-tight">Data Retention</h3>
+            </div>
+          </div>
+          <p class="text-slate-300 leading-relaxed">
+            When you place an order through the Site, we will maintain your Order Information for our records unless and until you ask us to delete this information.
+          </p>
+        </div>
+
+        <!-- Section 07 -->
+        <div id="changes" class="policy-section px-6 py-7 reveal">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 bg-navy-700 border border-gold-500/25 rounded flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-rotate text-gold-400 text-sm"></i>
+            </div>
+            <div>
+              <span class="coord-text text-[0.6rem]">SECTION 07</span>
+              <h3 class="font-display font-bold text-white text-xl leading-tight">Changes to This Policy</h3>
+            </div>
+          </div>
+          <p class="text-slate-300 leading-relaxed">
+            We may update this privacy policy from time to time in order to reflect, for example, changes to our practices or for other operational, legal, or regulatory reasons. We encourage you to review this policy periodically to stay informed about how we are protecting the personal information we collect.
+          </p>
+        </div>
+
+        <!-- Section 08 — Contact -->
+        <div id="contact" class="policy-section px-6 py-7 reveal">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 bg-navy-700 border border-gold-500/25 rounded flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-envelope text-gold-400 text-sm"></i>
+            </div>
+            <div>
+              <span class="coord-text text-[0.6rem]">SECTION 08</span>
+              <h3 class="font-display font-bold text-white text-xl leading-tight">Contact Us</h3>
+            </div>
+          </div>
+          <p class="text-slate-300 leading-relaxed mb-6">
+            For more information about our privacy practices, if you have questions, or if you would like to make a complaint, please contact us.
+          </p>
+
+          <div class="grid sm:grid-cols-2 gap-4">
+            <a href="mailto:abhisek@shellbackmarines.com" class="flex items-start gap-4 bg-navy-900/70 border border-gold-500/15 hover:border-gold-400/40 rounded p-4 transition-all group">
+              <div class="w-10 h-10 bg-gold-500/10 border border-gold-500/20 rounded flex items-center justify-center flex-shrink-0 group-hover:bg-gold-500/20 transition-colors">
+                <i class="fa-solid fa-envelope text-gold-400 text-sm"></i>
+              </div>
+              <div>
+                <div class="text-slate-500 text-xs font-condensed uppercase tracking-wider mb-1">Email</div>
+                <div class="text-gold-300 group-hover:text-gold-200 text-sm transition-colors break-all">abhisek@shellbackmarines.com</div>
+              </div>
+            </a>
+            <div class="flex items-start gap-4 bg-navy-900/70 border border-gold-500/15 rounded p-4">
+              <div class="w-10 h-10 bg-gold-500/10 border border-gold-500/20 rounded flex items-center justify-center flex-shrink-0">
+                <i class="fa-solid fa-location-dot text-gold-400 text-sm"></i>
+              </div>
+              <div>
+                <div class="text-slate-500 text-xs font-condensed uppercase tracking-wider mb-1">Address</div>
+                <address class="text-slate-300 not-italic text-sm leading-relaxed">
+                  Shellback Marines<br/>
+                  Oodlabari Bidhanpally PO Manabari<br/>
+                  Dist Jalpaiguri, WB 735222
+                </address>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end policy sections -->
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     CTA BANNER
+════════════════════════════════════════════ -->
+<section class="relative py-20 overflow-hidden">
+  <div class="absolute inset-0">
+    <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1800&q=80" alt="Ocean background" class="w-full h-full object-cover opacity-15" />
+    <div class="absolute inset-0 bg-gradient-to-r from-navy-950 via-navy-900/90 to-navy-950"></div>
+  </div>
+  <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center reveal">
+    <div class="w-16 h-16 bg-gold-500/10 border border-gold-500/30 rounded-full flex items-center justify-center mx-auto mb-6">
+      <i class="fa-solid fa-map text-gold-400 text-2xl"></i>
+    </div>
+    <h2 class="font-display font-bold text-white text-3xl lg:text-5xl mb-5 leading-tight">
+      Ready to Navigate with <span class="text-gold-400">Confidence?</span>
+    </h2>
+    <p class="text-slate-400 text-lg mb-10 max-w-xl mx-auto leading-relaxed">
+      Browse our full catalogue of nautical charts, hydrographic publications, and navigational instruments — all in one place.
+    </p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+      <a href="products.html" class="bg-gold-500 hover:bg-gold-400 text-navy-950 font-condensed font-bold uppercase tracking-wider px-10 py-4 transition-all hover:scale-105 rounded-sm text-sm">
+        <i class="fa-solid fa-store mr-2"></i>Browse Our Catalogue
+      </a>
+      <a href="contact.html" class="border border-gold-500/50 hover:border-gold-400 text-gold-300 font-condensed font-bold uppercase tracking-wider px-10 py-4 transition-all hover:bg-gold-500/10 rounded-sm text-sm">
+        <i class="fa-solid fa-envelope mr-2"></i>Contact Us
+      </a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════ -->
+<footer class="bg-navy-950 border-t border-gold-500/15">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-10">
+
+      <!-- Brand -->
+      <div class="lg:col-span-1">
+        <div class="flex items-center gap-3 mb-5">
+          <img src="./img/logo.png" alt="Shellback Marines Logo" class="w-10 h-10 rounded-full object-contain border-2 border-gold-500 bg-navy-800" />
+          <div>
+            <div class="font-display font-bold text-white text-base">Shellback Marines</div>
+            <div class="coord-text">SINCE 2023</div>
+          </div>
+        </div>
+        <p class="text-slate-400 text-sm leading-relaxed mb-5">
+          Premier source for hydrographic products and nautical charts. Serving mariners, naval forces, and maritime professionals across India.
+        </p>
+        <div class="flex gap-3">
+          <a href="#" class="w-9 h-9 bg-navy-800 border border-gold-500/20 hover:border-gold-400 rounded flex items-center justify-center text-slate-400 hover:text-gold-300 transition-all">
+            <i class="fa-brands fa-facebook-f text-sm"></i>
+          </a>
+          <a href="#" class="w-9 h-9 bg-navy-800 border border-gold-500/20 hover:border-gold-400 rounded flex items-center justify-center text-slate-400 hover:text-gold-300 transition-all">
+            <i class="fa-brands fa-instagram text-sm"></i>
+          </a>
+          <a href="#" class="w-9 h-9 bg-navy-800 border border-gold-500/20 hover:border-gold-400 rounded flex items-center justify-center text-slate-400 hover:text-gold-300 transition-all">
+            <i class="fa-brands fa-linkedin-in text-sm"></i>
+          </a>
+          <a href="https://wa.me/919742172874" class="w-9 h-9 bg-navy-800 border border-gold-500/20 hover:border-gold-400 rounded flex items-center justify-center text-slate-400 hover:text-gold-300 transition-all">
+            <i class="fa-brands fa-whatsapp text-sm"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Links -->
+      <div>
+        <h4 class="font-condensed font-bold text-white uppercase tracking-wider text-sm mb-5">Quick Links</h4>
+        <ul class="space-y-2.5">
+          <li><a href="index.html" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-gold-500/50 text-xs"></i>Home</a></li>
+          <li><a href="about.html" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-gold-500/50 text-xs"></i>About Us</a></li>
+          <li><a href="products.html" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-gold-500/50 text-xs"></i>Products</a></li>
+          <li><a href="index.html#why-us" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-gold-500/50 text-xs"></i>Why Choose Us</a></li>
+          <li><a href="contact.html" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-gold-500/50 text-xs"></i>Contact Us</a></li>
+          <li><a href="privacy-policy.html" class="text-gold-300 text-sm flex items-center gap-2"><i class="fa-solid fa-chevron-right text-gold-500/50 text-xs"></i>Privacy Policy</a></li>
+        </ul>
+      </div>
+
+      <!-- Categories -->
+      <div>
+        <h4 class="font-condensed font-bold text-white uppercase tracking-wider text-sm mb-5">Categories</h4>
+        <ul class="space-y-2.5">
+          <li><a href="products.html" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-map text-gold-500/50 text-xs"></i>Paper Charts</a></li>
+          <li><a href="products.html" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-book text-gold-500/50 text-xs"></i>Nautical Publications</a></li>
+          <li><a href="products.html" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-compass text-gold-500/50 text-xs"></i>Navigational Instruments</a></li>
+          <li><a href="products.html" class="text-slate-400 hover:text-gold-300 text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chart-area text-gold-500/50 text-xs"></i>Hydrographic Reports</a></li>
+        </ul>
+      </div>
+
+      <!-- Contact -->
+      <div>
+        <h4 class="font-condensed font-bold text-white uppercase tracking-wider text-sm mb-5">Contact</h4>
+        <ul class="space-y-4">
+          <li class="flex items-start gap-3">
+            <i class="fa-solid fa-phone text-gold-400 mt-0.5 flex-shrink-0 text-sm"></i>
+            <a href="tel:+919742172874" class="text-slate-400 hover:text-gold-300 text-sm transition-colors">+91-97421 72874</a>
+          </li>
+          <li class="flex items-start gap-3">
+            <i class="fa-solid fa-envelope text-gold-400 mt-0.5 flex-shrink-0 text-sm"></i>
+            <a href="mailto:abhisek@shellbackmarines.com" class="text-slate-400 hover:text-gold-300 text-sm transition-colors break-all">abhisek@shellbackmarines.com</a>
+          </li>
+          <li class="flex items-start gap-3">
+            <i class="fa-solid fa-location-dot text-gold-400 mt-0.5 flex-shrink-0 text-sm"></i>
+            <address class="text-slate-400 not-italic text-sm leading-relaxed">Oodlabari Bidhanpally PO Manabari, Dist Jalpaiguri, WB 735222</address>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="border-t border-white/5 mt-12 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p class="text-slate-500 text-sm">© 2025 Shellback Marines. All rights reserved.</p>
+      <p class="text-slate-600 text-xs font-condensed uppercase tracking-wider">Guardians of the Nation · Warriors of the Seas</p>
+    </div>
+  </div>
+</footer>
+
+<!-- WhatsApp Button -->
+<a href="https://wa.me/919742172874" target="_blank" rel="noopener noreferrer"
+   id="whatsapp-btn"
+   aria-label="Chat on WhatsApp"
+   style="position:fixed;bottom:84px;right:24px;z-index:41;width:48px;height:48px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(37,211,102,.4);transition:transform .2s ease,box-shadow .2s ease;text-decoration:none"
+   onmouseover="this.style.transform='scale(1.1)';this.style.boxShadow='0 6px 24px rgba(37,211,102,.6)'"
+   onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 4px 16px rgba(37,211,102,.4)'">
+  <i class="fa-brands fa-whatsapp" style="color:#fff;font-size:1.5rem;line-height:1"></i>
+</a>
+
+<!-- Scroll to Top -->
+<button id="scroll-top" class="fixed bottom-6 right-6 w-12 h-12 bg-gold-500 hover:bg-gold-400 text-navy-950 rounded-full shadow-lg flex items-center justify-center opacity-0 translate-y-4 transition-all duration-300 z-40" aria-label="Scroll to top">
+  <i class="fa-solid fa-chevron-up"></i>
+</button>
+
+
+<!-- ════════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════════ -->
+<script>
+  // ── Mobile menu ──
+  const menuBtn = document.getElementById('menu-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const menuIcon = document.getElementById('menu-icon');
+  menuBtn.addEventListener('click', () => {
+    mobileMenu.classList.toggle('open');
+    menuIcon.className = mobileMenu.classList.contains('open')
+      ? 'fa-solid fa-xmark' : 'fa-solid fa-bars';
+  });
+  mobileMenu.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      mobileMenu.classList.remove('open');
+      menuIcon.className = 'fa-solid fa-bars';
+    });
+  });
+
+  // ── Scroll reveal ──
+  const revealEls = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        revealObserver.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08 });
+  revealEls.forEach(el => revealObserver.observe(el));
+
+  // ── Scroll-to-top ──
+  const scrollTopBtn = document.getElementById('scroll-top');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 400) {
+      scrollTopBtn.style.opacity = '1';
+      scrollTopBtn.style.transform = 'translateY(0)';
+    } else {
+      scrollTopBtn.style.opacity = '0';
+      scrollTopBtn.style.transform = 'translateY(1rem)';
+    }
+  });
+  scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+  // ── Navbar compact on scroll ──
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('py-0', window.scrollY > 60);
+  });
+
+  // ── Smooth scroll for ToC links ──
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        const offset = 100;
+        const top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+    });
+  });
+</script>
+</body>
+</html>
