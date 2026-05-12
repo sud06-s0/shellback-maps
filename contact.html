@@ -1050,24 +1050,47 @@
 
     if (!valid) return;
 
-    // Simulate submission
+    // Real submission to Google Apps Script
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzsAzc_sXT936D3HibKgwE91FuxrB66Tc0udAx8Jb3H9gRMoM5Ju2kGOhBjeKriVgt5/exec';
+
     const btn     = document.getElementById('submit-btn');
     const btnText = document.getElementById('btn-text');
     btn.disabled  = true;
     btnText.textContent = 'Sending…';
     btn.querySelector('i').className = 'fa-solid fa-spinner fa-spin';
 
-    setTimeout(() => {
+    const payload = {
+      sheet: 'Contact',
+      fullName:     document.getElementById('name').value.trim(),
+      subject:      document.getElementById('subject').value,
+      phoneNumber:  document.getElementById('phone').value.trim(),
+      emailAddress: document.getElementById('email').value.trim(),
+      vessel:       document.getElementById('vessel').value.trim(),
+      message:      document.getElementById('message').value.trim(),
+    };
+
+    fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+    .then(() => {
       this.reset();
       btn.disabled = false;
       btnText.textContent = 'Send Message';
       btn.querySelector('i').className = 'fa-solid fa-paper-plane';
 
-      // Show toast
       const toast = document.getElementById('toast');
       toast.classList.add('show');
       setTimeout(() => toast.classList.remove('show'), 5000);
-    }, 1500);
+    })
+    .catch(() => {
+      btn.disabled = false;
+      btnText.textContent = 'Send Message';
+      btn.querySelector('i').className = 'fa-solid fa-paper-plane';
+      alert('Something went wrong. Please try again or contact us directly.');
+    });
   });
 
   /* Clear field error on input */

@@ -896,29 +896,31 @@
 
       <!-- Contact Form -->
       <div class="reveal-right">
-        <form class="space-y-5" onsubmit="handleSubmit(event)">
+        <form id="enquiry-form" class="space-y-5" onsubmit="handleSubmit(event)">
           <div class="grid sm:grid-cols-2 gap-5">
             <div>
               <label class="block text-slate-400 text-xs font-condensed uppercase tracking-wider mb-2">Your Name</label>
-              <input type="text" placeholder="Capt. Full Name" class="w-full bg-navy-800 border border-gold-500/20 focus:border-gold-400 outline-none text-white placeholder-slate-500 px-4 py-3 rounded text-sm transition-colors" />
+              <input id="enq-name" type="text" placeholder="Capt. Full Name" class="w-full bg-navy-800 border border-gold-500/20 focus:border-gold-400 outline-none text-white placeholder-slate-500 px-4 py-3 rounded text-sm transition-colors" required />
             </div>
             <div>
               <label class="block text-slate-400 text-xs font-condensed uppercase tracking-wider mb-2">Email Address</label>
-              <input type="email" placeholder="you@example.com" class="w-full bg-navy-800 border border-gold-500/20 focus:border-gold-400 outline-none text-white placeholder-slate-500 px-4 py-3 rounded text-sm transition-colors" />
+              <input id="enq-email" type="email" placeholder="you@example.com" class="w-full bg-navy-800 border border-gold-500/20 focus:border-gold-400 outline-none text-white placeholder-slate-500 px-4 py-3 rounded text-sm transition-colors" required />
             </div>
           </div>
           <div>
             <label class="block text-slate-400 text-xs font-condensed uppercase tracking-wider mb-2">Subject</label>
-            <input type="text" placeholder="Chart enquiry / Product query" class="w-full bg-navy-800 border border-gold-500/20 focus:border-gold-400 outline-none text-white placeholder-slate-500 px-4 py-3 rounded text-sm transition-colors" />
+            <input id="enq-subject" type="text" placeholder="Chart enquiry / Product query" class="w-full bg-navy-800 border border-gold-500/20 focus:border-gold-400 outline-none text-white placeholder-slate-500 px-4 py-3 rounded text-sm transition-colors" required />
           </div>
           <div>
             <label class="block text-slate-400 text-xs font-condensed uppercase tracking-wider mb-2">Message</label>
-            <textarea rows="5" placeholder="Describe what charts or products you need..." class="w-full bg-navy-800 border border-gold-500/20 focus:border-gold-400 outline-none text-white placeholder-slate-500 px-4 py-3 rounded text-sm transition-colors resize-none"></textarea>
+            <textarea id="enq-message" rows="5" placeholder="Describe what charts or products you need..." class="w-full bg-navy-800 border border-gold-500/20 focus:border-gold-400 outline-none text-white placeholder-slate-500 px-4 py-3 rounded text-sm transition-colors resize-none" required></textarea>
           </div>
-          <button type="submit" class="w-full bg-gold-500 hover:bg-gold-400 text-navy-950 font-condensed font-bold uppercase tracking-wider py-4 transition-all hover:scale-[1.02] rounded-sm text-sm">
-            <i class="fa-solid fa-paper-plane mr-2"></i>Send Message
+          <button id="enq-submit-btn" type="submit" class="w-full bg-gold-500 hover:bg-gold-400 text-navy-950 font-condensed font-bold uppercase tracking-wider py-4 transition-all hover:scale-[1.02] rounded-sm text-sm flex items-center justify-center gap-2">
+            <i id="enq-btn-icon" class="fa-solid fa-paper-plane"></i>
+            <span id="enq-btn-text">Send Message</span>
           </button>
           <p id="form-success" class="hidden text-green-400 text-sm text-center font-condensed"><i class="fa-solid fa-check-circle mr-1"></i>Message sent! We'll be in touch shortly.</p>
+          <p id="form-error" class="hidden text-red-400 text-sm text-center font-condensed"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Something went wrong. Please try again.</p>
         </form>
       </div>
 
@@ -1120,10 +1122,46 @@
   // ── Contact form ──
   function handleSubmit(e) {
     e.preventDefault();
-    const success = document.getElementById('form-success');
-    success.classList.remove('hidden');
-    e.target.reset();
-    setTimeout(() => success.classList.add('hidden'), 5000);
+
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzsAzc_sXT936D3HibKgwE91FuxrB66Tc0udAx8Jb3H9gRMoM5Ju2kGOhBjeKriVgt5/exec';
+
+    const btn     = document.getElementById('enq-submit-btn');
+    const btnText = document.getElementById('enq-btn-text');
+    const btnIcon = document.getElementById('enq-btn-icon');
+    btn.disabled  = true;
+    btnText.textContent = 'Sending…';
+    btnIcon.className   = 'fa-solid fa-spinner fa-spin';
+
+    const payload = {
+      sheet:   'Enquiry',
+      name:    document.getElementById('enq-name').value.trim(),
+      email:   document.getElementById('enq-email').value.trim(),
+      subject: document.getElementById('enq-subject').value.trim(),
+      message: document.getElementById('enq-message').value.trim(),
+    };
+
+    fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+    .then(() => {
+      e.target.reset();
+      btn.disabled = false;
+      btnText.textContent = 'Send Message';
+      btnIcon.className   = 'fa-solid fa-paper-plane';
+      const success = document.getElementById('form-success');
+      success.classList.remove('hidden');
+      setTimeout(() => success.classList.add('hidden'), 5000);
+    })
+    .catch(() => {
+      btn.disabled = false;
+      btnText.textContent = 'Send Message';
+      btnIcon.className   = 'fa-solid fa-paper-plane';
+      const err = document.getElementById('form-error');
+      if (err) { err.classList.remove('hidden'); setTimeout(() => err.classList.add('hidden'), 5000); }
+    });
   }
 </script>
 
